@@ -1,0 +1,21 @@
+.record-tag {
+  padding: 0.1em 0.4em;
+  margin: 0.05 0.5em;
+  border-radius: 0.3em;
+  background-color: blue;
+  font-size: smaller;
+  font-weight: bold;
+
+  &.upgraded-record {
+    background-color: green;
+  }
+
+  &.downgraded-record {
+    background-color: red;
+  }
+
+  .replaced-record {
+    text-decoration: line-through;
+    font-weight: normal;
+  }
+}

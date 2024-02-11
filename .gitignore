@@ -1,0 +1,9 @@
+data/multi_ranks.duckdb
+
+*.env
+
+api/__pycache__/
+
+web/.parcel-cache/
+web/dist/
+web/node_modules/
