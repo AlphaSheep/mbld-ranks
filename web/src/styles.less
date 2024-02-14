@@ -1,5 +1,8 @@
 @import (css) url(https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600;700&display=swap);
 
+@import (less) 'variables.less';
+
+
 * {
   box-sizing: border-box;
 }
@@ -16,7 +19,7 @@ body {
   padding-bottom: 4em;
   margin: 0;
 
-  background-color: #050505;
+  background-color: @background-color;
   color: #ccc;
 
   font-family: 'Open Sans', sans-serif;
@@ -28,6 +31,12 @@ body {
 
   a {
     text-decoration: none;
+    color: @link-color;
+    transition: all 0.3s ease;
+
+    &:hover {
+      color: @link-hover-color;
+    }
   }
 }
 
@@ -38,6 +47,25 @@ body {
   justify-content: center;
 
   padding: 1em;
+}
+
+.link-list {
+  display: flex;
+  flex-direction: column;
+  justify-content: stretch;
+  align-items: center;
+  padding: 1em;
+
+  li {
+    padding: 1em;
+    list-style: none;
+    font-size: large;
+
+    span {
+      margin-left: 0.5em;
+    }
+  }
+
 }
 
 table {
@@ -54,31 +82,35 @@ table {
     transition: all 0.3s ease;
 
     &:hover {
-      color: #ea3;
+      color: @link-hover-color;
     }
   }
 
   th, td {
     padding: 0.5em;
     text-align: left;
-    border-bottom: 1px solid #333;
+    border-bottom: 1px solid @table-border-color
   }
 
   th {
-    background-color: #222;
-    border-top: 1px solid #333;
+    background-color: @table-header-background-color;
+    border-top: 1px solid @table-border-color;
+  }
+
+  tr {
+    background-color: @table-row-background-color;
   }
 
   tr:nth-child(even) {
-    background-color: #0a0a0a;
+    background-color: @table-row-alternate-background-color;
   }
 
   th:first-child, td:first-child {
-    border-left: 1px solid #333;
+    border-left: 1px solid @table-border-color;
   }
 
   th:last-child, td:last-child {
-    border-right: 1px solid #333;
+    border-right: 1px solid @table-border-color;
   }
 
 }
@@ -88,4 +120,21 @@ table {
   max-width: 100%;
   overflow-x: auto;
   padding: 2em 1em;
+}
+
+.code {
+  font-family: monospace;
+}
+
+.alert-container {
+  position: fixed;
+  top: 1em;
+  right: 1em;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  z-index: 1000;
 }

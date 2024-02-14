@@ -1,12 +1,15 @@
+@import (less) '../variables.less';
+
 nav {
-  background-color: #111;
+  background-color: @header-background-color;
   padding: 0;
   margin: 0;
+  margin-bottom: 0.5em;
   display: flex;
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 4px @header-border-color;
   font-size: larger;
 
   ul {
@@ -24,15 +27,36 @@ nav {
 
       a {
         text-decoration: none;
-        color: #eee;
+        text-shadow: 0 1px 2px black;
+
+        color: @header-text-color;
 
         transition: all 0.3s ease;
 
         &:hover {
-          color: #fa3;
+          color: @link-hover-color;
         }
+      }
+
+      .tooltip {
+        display: none;
+      }
+
+      &:hover .tooltip {
+        display: block;
+        position: absolute;
+        text-align: center;
+        background-color: @tooltip-background-color;
+        color: @tooltip-text-color;
+        font-size: 0.85em;
+        padding: 0.5em;
+        border-radius: 0.5em;
+        border: 1px solid @tooltip-border-color;
+        transform: translateX(-50%);
       }
     }
   }
+
+
 
 }

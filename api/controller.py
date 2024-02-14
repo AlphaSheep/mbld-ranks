@@ -44,10 +44,6 @@ def fetch_countries() -> list[Country]:
     return _fetch_structured_data(db.SELECT_COUNTRIES, Country)
 
 
-def fetch_countries_with_results() -> list[Country]:
-    return _fetch_structured_data(db.SELECT_COUNTRIES_WITH_RESULTS, Country)
-
-
 def fetch_continent() -> list[Continent]:
     return _fetch_structured_data(db.SELECT_CONTINENTS, Continent)
 

@@ -1,15 +1,17 @@
+@import (less) '../variables.less';
+
 footer {
   position: fixed;
   bottom: 0;
   width: 100%;
-  background-color: #111;
+  background-color: @header-background-color;
   display: flex;
   flex-direction: row;
   justify-content: end;
   align-items: center;
   padding: 0.8em 1em;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  border-top: 1px solid #000;
+  box-shadow: 0 -2px 4px @header-border-color;
+  border-top: 1px solid @header-border-color;
   font-size: small;
 
   span {
@@ -19,12 +21,12 @@ footer {
 
   a {
     text-decoration: none;
-    color: #eee;
+    color: @header-text-color;
 
     transition: all 0.3s ease;
 
     &:hover {
-      color: #fa3;
+      color: @link-hover-color;
     }
   }
 }

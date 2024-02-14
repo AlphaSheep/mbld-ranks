@@ -3,4 +3,5 @@ export default interface Country {
   name: string;
   continentId: string;
   iso2: string;
+  hasResults?: boolean;
 }

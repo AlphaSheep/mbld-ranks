@@ -18,7 +18,7 @@ export default function PersonPage () {
     throw new Error('PersonContext is not available');
   }
 
-  const { person, getPerson, loadingPerson, results, getResults, loadingResults } = context;
+  const { person, getPerson, loadingPerson, personRanks, getPersonRanks, results, getResults, loadingResults } = context;
 
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = e.target.value.toUpperCase();
@@ -28,12 +28,12 @@ export default function PersonPage () {
     } else {
       setValidWcaId(false);
     }
-
   };
 
   const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     getPerson(wcaId);
+    getPersonRanks(wcaId);
     getResults(wcaId);
     setQuery({ wcaid: wcaId });
   };
@@ -47,8 +47,10 @@ export default function PersonPage () {
       </div>
     </form>
 
+    {person ? null : <p>Enter a WCA ID to get started</p>}
+
     {loadingPerson ? <div>Loading person...</div> :
-      <PersonDetails person={person} />
+      <PersonDetails person={person} personRanks={personRanks} />
     }
 
     {loadingResults ? <div>Loading results...</div> :

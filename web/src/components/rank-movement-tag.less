@@ -1,6 +1,6 @@
 @import (less) "../variables.less";
 
-.record-tag {
+.rank-movement-tag {
   padding: 0.1em 0.4em;
   margin: 0.05 0.5em;
   border-radius: 0.4em;
@@ -14,27 +14,15 @@
   background-color: @record-unchanged-bg-color;
   border: 1px solid @record-unchanged-border-color;
 
-  &.upgraded-record {
+  &.up {
     color: @record-gained-text-color;
     background-color: @record-gained-bg-color;
     border: 1px solid @record-gained-border-color;
   }
 
-  &.downgraded-record {
+  &.down {
     color: @record-lost-text-color;
     background-color: @record-lost-bg-color;
     border: 1px solid @record-lost-border-color;
-  }
-
-  .replaced-record {
-    text-decoration: line-through;
-    font-weight: normal;
-    font-size: smaller;
-  }
-}
-
-.tag-legend {
-  li {
-    margin-bottom: 0.5em;
   }
 }

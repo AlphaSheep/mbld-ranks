@@ -123,14 +123,6 @@ async def get_competition(competition_id: str) -> Competition:
     return fetch_competition_by_id(competition_id)
 
 
-@app.get("/api/v0/countries/withresults", tags=["Regions"])
-async def get_countries_with_results() -> list[Country]:
-    '''
-    Get all countries with valid results.
-    '''
-    return fetch_countries_with_results()
-
-
 @app.get("/api/v0/countries", tags=["Regions"])
 async def get_countries(request: Request, response: Response) -> list[Country]:
     '''
