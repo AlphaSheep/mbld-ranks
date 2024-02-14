@@ -9,16 +9,17 @@ class Ranking:
     personId: str
     personCountryId: str
     wcaRecord: str
-    wcaPos: int
     best_score: float
     best_result: int
     continentId: str
     startdate: date
     regionalRecord: str
-    pos: int
-    worldRank: int
-    continentRank: int
-    countryRank: int
+    worldRank: int | None
+    continentRank: int | None
+    countryRank: int | None
+    wcaWorldRank: int | None
+    wcaContinentRank: int | None
+    wcaCountryRank: int | None
 
 
 @dataclass
@@ -76,6 +77,7 @@ class Country:
     name: str
     continentId: str
     iso2: str
+    hasResults: bool
 
 
 @dataclass

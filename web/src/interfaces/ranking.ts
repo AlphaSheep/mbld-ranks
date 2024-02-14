@@ -14,5 +14,9 @@ export default interface Ranking {
   worldRank: number;
   continentRank: number;
   countryRank: number;
+  wcaWorldRank: number;
+  wcaContinentRank: number;
+  wcaCountryRank: number;
   rank?: number;
+  wcaRank?: number;
 }

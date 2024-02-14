@@ -1,8 +1,4 @@
 SELECT_COUNTRIES = "SELECT * FROM countries"
-SELECT_COUNTRIES_WITH_RESULTS = """
-    SELECT * FROM countries
-    WHERE id IN (SELECT DISTINCT personCountryId FROM results WHERE best_result > 0)
-"""
 SELECT_COUNTRY_IDS = "SELECT id FROM countries"
 SELECT_COUNTRY_BY_ID = "SELECT * FROM countries WHERE id = ?"
 SELECT_CONTINENTS = "SELECT * FROM continents"
@@ -41,11 +37,12 @@ SELECT_WORLD_RECORD_HISTORY = """
 """
 SELECT_CONTINENT_RECORD_HISTORY = """
     SELECT * FROM results
-    WHERE continentId = ? AND (wcaRecord in (?, 'WR') OR regionalRecord in ('CR', 'WR'))
+    WHERE continentId = ? AND (wcaRecord in (?, 'WR') OR regionalRecord in (?, 'WR'))
 """
 SELECT_COUNTRY_RECORD_HISTORY = """
     SELECT * FROM results
-    WHERE personCountryId = ? AND (wcaRecord <> '' OR regionalRecord <> '')
+    WHERE personCountryId = ?
+    AND ((wcaRecord <> '' AND wcaRecord <> 'PR') OR (regionalRecord <> '' AND regionalRecord <> 'PR'))
 """
 
 SELECT_METADATA = "SELECT updated_at FROM metadata"
