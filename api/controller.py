@@ -138,10 +138,7 @@ def fetch_record_history_by_region(region: str) -> list[Result]:
         return _fetch_structured_data(db.SELECT_WORLD_RECORD_HISTORY, Result)
     if region in fetch_continent_ids():
         recordName = fetch_record_id_for_continent(region)
-        print('-------------------')
-        print((region, recordName))
-        print('-------------------')
-        return _fetch_structured_data(db.SELECT_CONTINENT_RECORD_HISTORY, Result, (region, recordName))
+        return _fetch_structured_data(db.SELECT_CONTINENT_RECORD_HISTORY, Result, (region, recordName, recordName))
     if region in fetch_country_ids():
         return _fetch_structured_data(db.SELECT_COUNTRY_RECORD_HISTORY, Result, (region,))
     raise NotFoundError(f"Region with id {region} not found")

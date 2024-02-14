@@ -1,6 +1,6 @@
 from typing import Any
 
-from fastapi import FastAPI, HTTPException, status
+from fastapi import FastAPI, HTTPException, status, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
 
 from slowapi import Limiter, _rate_limit_exceeded_handler
@@ -8,7 +8,7 @@ from slowapi.util import get_remote_address
 from slowapi.errors import RateLimitExceeded
 from slowapi.middleware import SlowAPIMiddleware
 
-from data import InvalidRequestError, NotFoundError, fetch_competition_by_id, fetch_countries, fetch_continent_ids, fetch_countries_with_results, fetch_metadata, fetch_person_by_id, fetch_ranking_by_region, fetch_ranking_for_person, fetch_record_history_by_region, fetch_results_by_competition_id, fetch_results_by_person_id, fetch_round_types, fetch_competitions_matching_query
+from controller import InvalidRequestError, NotFoundError, fetch_competition_by_id, fetch_countries, fetch_continent_ids, fetch_metadata, fetch_person_by_id, fetch_ranking_by_region, fetch_ranking_for_person, fetch_record_history_by_region, fetch_results_by_competition_id, fetch_results_by_person_id, fetch_round_types, fetch_competitions_matching_query
 from schema import Competition, Country, ErrorMessage, Person, Ranking, Result, RoundType, Metadata
 
 
@@ -32,9 +32,10 @@ app = FastAPI(
 )
 
 
-limiter = Limiter(key_func=get_remote_address, application_limits=["50/minute"])
+limiter = Limiter(key_func=get_remote_address, application_limits=["50/30 seconds"], headers_enabled=True)
 app.state.limiter = limiter
 
+app.add_middleware(SlowAPIMiddleware)
 
 app.add_middleware(
     CORSMiddleware,
@@ -43,8 +44,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-app.add_middleware(SlowAPIMiddleware)
-
 
 
 @app.exception_handler(NotFoundError)
@@ -56,9 +55,8 @@ async def invalid_request(_, exc: InvalidRequestError):
     raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc))
 
 @app.exception_handler(RateLimitExceeded)
-async def rate_limited(request, exc):
+async def rate_limited(request: Request, exc: RateLimitExceeded):
     return _rate_limit_exceeded_handler(request, exc)
-
 
 
 @app.get("/api/v0/person/results/{wca_id}", tags=["People"], responses={**NOT_FOUND})
@@ -94,7 +92,7 @@ async def get_results_for_competition(competition_id: str) -> list[Result]:
 
 
 @app.get("/api/v0/competition/roundtypes", tags=["Competitions"])
-async def get_round_types() -> list[RoundType]:
+async def get_round_types(request: Request, response: Response) -> list[RoundType]:
     '''
     Get available round types.
     '''
@@ -134,7 +132,7 @@ async def get_countries_with_results() -> list[Country]:
 
 
 @app.get("/api/v0/countries", tags=["Regions"])
-async def get_countries() -> list[Country]:
+async def get_countries(request: Request, response: Response) -> list[Country]:
     '''
     Get all countries.
     '''
@@ -142,7 +140,7 @@ async def get_countries() -> list[Country]:
 
 
 @app.get("/api/v0/continents", tags=["Regions"])
-async def get_continents() -> list[str]:
+async def get_continents(request: Request, response: Response) -> list[str]:
     '''
     Get all continents.
     '''
