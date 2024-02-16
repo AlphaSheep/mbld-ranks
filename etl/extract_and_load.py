@@ -106,6 +106,8 @@ _JOIN_WCA_RANKS_QUERY = '''
 
 def _fetch_data_from_mysql(query: str) -> pd.DataFrame:
     with mysql.connect(
+        host=os.getenv('WCA_MYSQL_HOST'),
+        port=os.getenv('WCA_MYSQL_PORT'),
         database=os.getenv('WCA_MYSQL_DATABASE'),
         user = os.environ['WCA_MYSQL_USER'],
         password = os.environ['WCA_MYSQL_PASSWORD'],
