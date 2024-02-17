@@ -10,7 +10,7 @@ import alertService from './alert-service';
 
 class ResultsService {
 
-  private _api: string = process.env.API_URL || "";
+  private _api: string = process.env.API_URL || "api/v0";
 
   private _countries_fetch_in_progress: Promise<Country[]> | undefined;
 
