@@ -10,7 +10,7 @@ COPY ./src ./src
 
 RUN npm run build
 
-COPY ./analytics.sh ./
+COPY ./analytics* ./
 RUN ./analytics.sh
 
 
