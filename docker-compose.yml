@@ -6,13 +6,15 @@ services:
     env_file: ./etl/.env
     volumes:
       - ./data:/data
+    networks:
+      - wca-db-network
 
   mbld-ranks-api:
     build: ./api
     restart: always
     env_file: ./api/.env
     ports:
-      - "8000:8000"
+      - "4212:8000"
     volumes:
       - ./data:/data
     networks:
@@ -23,12 +25,13 @@ services:
     restart: always
     env_file: ./web/.env
     ports:
-      - "3000:3000"
-    volumes:
-      - ./data:/data
+      - "4211:80"
     networks:
       - mbld-ranks-network
 
 networks:
   mbld-ranks-network:
     driver: bridge
+  wca-db-network:
+    name: wca-db-network
+    external: true
