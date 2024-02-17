@@ -17,7 +17,7 @@ _RESULTS_IMPORT_QUERY = '''
         value3,
         regionalSingleRecord as wcaRecord,
         pos as wcaPos
-    FROM results
+    FROM Results
     WHERE eventId = '333mbf'
 '''
 
@@ -27,7 +27,7 @@ _COUNTRIES_IMPORT_QUERY = '''
         name,
         continentId,
         iso2
-    FROM countries
+    FROM Countries
 '''
 
 _CONTINENTS_IMPORT_QUERY = '''
@@ -35,7 +35,7 @@ _CONTINENTS_IMPORT_QUERY = '''
         id,
         name,
         recordName
-    FROM continents
+    FROM Continents
 '''
 
 _COMPETITIONS_IMPORT_QUERY = '''
@@ -44,7 +44,7 @@ _COMPETITIONS_IMPORT_QUERY = '''
         name,
         countryId,
         DATE(CONCAT(year, '-', LPAD(month, 2, '0'), '-', LPAD(day, 2, '0'))) AS startdate
-    FROM competitions
+    FROM Competitions
     WHERE cancelled = 0
 '''
 
@@ -55,7 +55,7 @@ _PERSONS_IMPORT_QUERY = '''
         name,
         countryId,
         gender
-    FROM persons
+    FROM Persons
 '''
 
 _ROUND_TYPES_IMPORT_QUERY = '''
@@ -65,7 +65,7 @@ _ROUND_TYPES_IMPORT_QUERY = '''
         cellName,
         `rank`,
         final
-    FROM roundtypes
+    FROM RoundTypes
 '''
 
 _GET_BEST_RESULT_QUERY = '''
@@ -76,7 +76,7 @@ _GET_BEST_RESULT_QUERY = '''
             WHEN score2 = GREATEST(score1, score2, score3) THEN value2
             ELSE value3
         END AS best_result
-    FROM results
+    FROM Results
 '''
 
 _UPDATE_TIMESTAMP_QUERY = '''
@@ -86,10 +86,10 @@ _UPDATE_TIMESTAMP_QUERY = '''
 _GET_WCA_SINGLE_RANKS_QUERY = '''
     SELECT
         personId,
-        rankssingle.worldRank as wcaWorldRank,
-        rankssingle.continentRank as wcaContinentRank,
-        rankssingle.countryRank as wcaCountryRank
-    FROM rankssingle
+        RanksSingle.worldRank as wcaWorldRank,
+        RanksSingle.continentRank as wcaContinentRank,
+        RanksSingle.countryRank as wcaCountryRank
+    FROM RanksSingle
     WHERE eventId = '333mbf'
 '''
 
