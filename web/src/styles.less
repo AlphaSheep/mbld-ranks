@@ -25,7 +25,7 @@ body {
   font-family: 'Open Sans', sans-serif;
   font-size: 11pt;
 
-  @media screen and (max-width: 768px) {
+  @media screen and (max-width: @small-screen) {
     font-size: 10pt;
   }
 
@@ -74,6 +74,7 @@ table {
   width: 100%;
   max-width: 100%;
   overflow-x: auto;
+  border-right: 1px solid @table-border-color;
 
   font-size: 1em;
 
@@ -89,7 +90,13 @@ table {
   th, td {
     padding: 0.5em;
     text-align: left;
-    border-bottom: 1px solid @table-border-color
+    border-bottom: 1px solid @table-border-color;
+
+    &.drop-if-small {
+      @media screen and (max-width: @x-small-screen) {
+        display: none;
+      }
+    }
   }
 
   th {

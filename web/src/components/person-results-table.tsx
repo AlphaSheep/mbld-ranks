@@ -23,7 +23,7 @@ export default function PersonResultsTable({ results }: { results: Result[] }) {
               <th>Round</th>
               <th>Place</th>
               <th>Best</th>
-              <th>Solves</th>
+              <th className="drop-if-small">Solves</th>
             </tr>
           </thead>
           <tbody>
@@ -42,7 +42,7 @@ export default function PersonResultsTable({ results }: { results: Result[] }) {
                 <FormattedResult value={result.best_result} score={result.best_score} />
                 <RecordTag result={result} />
               </td>
-              <td className="individual-results-list">
+              <td className="individual-results-list drop-if-small">
                 <div><FormattedResult value={result.value1} score={result.score1} /></div>
                 <div><FormattedResult value={result.value2} score={result.score2} /></div>
                 <div><FormattedResult value={result.value3} score={result.score3} /></div>

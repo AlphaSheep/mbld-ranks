@@ -19,7 +19,7 @@ export default function RecordsTable( { results }: { results: Result[] } ) {
               <th>Record</th>
               <th>Result</th>
               <th>Name</th>
-              <th>Competition</th>
+              <th className="drop-if-small">Competition</th>
             </tr>
           </thead>
           <tbody>
@@ -34,7 +34,7 @@ export default function RecordsTable( { results }: { results: Result[] } ) {
               <td>
                 <PersonLink personId={result.personId} personName={result.personName} personCountryId={result.personCountryId} />
               </td>
-              <td>
+              <td className="drop-if-small">
                 <CompetitionLink competition={compDetails[result.competitionId]} />
               </td>
             </tr>)}
