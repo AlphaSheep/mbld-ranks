@@ -48,6 +48,14 @@ body {
   justify-content: center;
 
   padding: 1em;
+
+  @media screen and (max-width: @small-screen) {
+    padding: 1em 0.5em;
+  }
+
+  @media screen and (max-width: @x-small-screen) {
+    padding: 1em 0.1em;
+  }
 }
 
 .link-list {
@@ -128,6 +136,10 @@ table {
   max-width: 100%;
   overflow-x: auto;
   padding: 2em 1em;
+
+  @media screen and (max-width: @small-screen) {
+    padding: 2em 0.1em;
+  }
 }
 
 .code {
