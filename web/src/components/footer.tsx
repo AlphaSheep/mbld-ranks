@@ -22,6 +22,9 @@ export default function Footer () {
         {updatedAt && <>, last updated on {updatedAt.toDateString()}</>}.
       </span>
       <span>
+        <a href="api/v0/docs">API</a>
+      </span>
+      <span>
         <a href="https://github.com/AlphaSheep/mbld-ranks" target="_blank" rel="noreferrer">
           <FontAwesomeIcon icon={faGithub} /> Github
         </a>

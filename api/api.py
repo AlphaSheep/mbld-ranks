@@ -25,6 +25,8 @@ app = FastAPI(
     title="Multi-Blind Alternative Ranking API",
     description=description,
     version="0.1.0",
+    openapi_url='/api/v0/openapi.json',
+    redoc_url='/api/v0/docs',
     license_info={
         "name": "MIT",
         "url": "https://opensource.org/license/mit/"
