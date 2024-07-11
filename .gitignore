@@ -1,4 +1,4 @@
-data/multi_ranks.duckdb
+*.duckdb
 
 *.env
 
