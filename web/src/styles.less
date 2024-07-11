@@ -1,7 +1,7 @@
-@import (css) url(https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600;700&display=swap);
+@import (css)
+  url(https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600;700&display=swap);
 
-@import (less) 'variables.less';
-
+@import (less) "variables.less";
 
 * {
   box-sizing: border-box;
@@ -23,7 +23,7 @@ body {
   background-color: @background-color;
   color: #ccc;
 
-  font-family: 'Open Sans', sans-serif;
+  font-family: "Open Sans", sans-serif;
   font-size: 11pt;
 
   @media screen and (max-width: @small-screen) {
@@ -58,6 +58,11 @@ body {
   }
 }
 
+.prose {
+  max-width: @small-screen;
+  line-height: 150%;
+}
+
 .link-list {
   display: flex;
   flex-direction: column;
@@ -74,11 +79,9 @@ body {
       margin-left: 0.5em;
     }
   }
-
 }
 
 table {
-
   border-collapse: collapse;
   width: 100%;
   max-width: 100%;
@@ -96,7 +99,8 @@ table {
     }
   }
 
-  th, td {
+  th,
+  td {
     padding: 0.5em;
     text-align: left;
     border-bottom: 1px solid @table-border-color;
@@ -121,14 +125,15 @@ table {
     background-color: @table-row-alternate-background-color;
   }
 
-  th:first-child, td:first-child {
+  th:first-child,
+  td:first-child {
     border-left: 1px solid @table-border-color;
   }
 
-  th:last-child, td:last-child {
+  th:last-child,
+  td:last-child {
     border-right: 1px solid @table-border-color;
   }
-
 }
 
 .table-container {
