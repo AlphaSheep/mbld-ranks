@@ -1,4 +1,4 @@
-@import (less) '../variables.less';
+@import (less) "../variables.less";
 
 nav {
   background-color: @header-background-color;
@@ -7,10 +7,32 @@ nav {
   margin-bottom: 0.5em;
   display: flex;
   flex-direction: row;
-  justify-content: space-between;
+  justify-content: stretch;
   align-items: center;
   box-shadow: 0 2px 4px @header-border-color;
   font-size: larger;
+  padding: 0.2em 0;
+
+  @media screen and (max-width: @small-screen) {
+    flex-direction: column;
+  }
+
+  .nav-title {
+    display: flex;
+
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+
+    @media screen and (max-width: @small-screen) {
+    }
+    width: 100%;
+
+    a {
+      padding-left: 1em;
+      width: 100%;
+    }
+  }
 
   ul {
     list-style: none;
@@ -22,10 +44,36 @@ nav {
     justify-content: end;
     align-items: center;
 
+    @media screen and (max-width: @small-screen) {
+      border-top: 1px solid @header-border-color;
+
+      &.collapsed {
+        display: none;
+      }
+
+      flex-direction: column;
+    }
+
     li {
       margin: 0 0.5em;
 
+      @media screen and (max-width: @small-screen) {
+        width: 100%;
+        padding: 0.3em;
+      }
+
       a {
+        display: flex;
+        flex-direction: row;
+        justify-content: flex-start;
+        align-items: center;
+
+        @media screen and (max-width: @small-screen) {
+          flex-direction: row-reverse;
+          justify-content: end;
+          width: 100%;
+        }
+
         text-decoration: none;
         text-shadow: 0 1px 2px black;
 
@@ -36,27 +84,31 @@ nav {
         &:hover {
           color: @link-hover-color;
         }
-      }
 
-      .tooltip {
-        display: none;
-      }
+        .nav-label {
+          font-size: small;
+          padding-left: 0.5em;
 
-      &:hover .tooltip {
-        display: block;
-        position: absolute;
-        text-align: center;
-        background-color: @tooltip-background-color;
-        color: @tooltip-text-color;
-        font-size: 0.85em;
-        padding: 0.5em;
-        border-radius: 0.5em;
-        border: 1px solid @tooltip-border-color;
-        transform: translateX(-50%);
+          @media screen and (max-width: @small-screen) {
+            font-size: 100%;
+            padding-right: 1em;
+          }
+        }
       }
     }
   }
 
+  .nav-collapse-button {
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    color: @header-text-color;
+    font-size: larger;
+    display: none;
+    padding: 0.3em 0.6em;
 
-
+    @media screen and (max-width: @small-screen) {
+      display: block;
+    }
+  }
 }
