@@ -3,17 +3,28 @@ from datetime import date
 
 
 @dataclass
-class Ranking:
+class BaseResult:
     competitionId: str
     personName: str
     personId: str
     personCountryId: str
     wcaRecord: str
     best_score: float
+    mean_score: float
     best_result: int
     continentId: str
     startdate: date
     regionalRecord: str
+    regionalMeanRecord: str
+    value1: int
+    value2: int
+    value3: int
+    score1: float
+    score2: float
+    score3: float
+
+
+class Ranking(BaseResult):
     worldRank: int | None
     continentRank: int | None
     countryRank: int | None
@@ -23,25 +34,9 @@ class Ranking:
 
 
 @dataclass
-class Result:
-    competitionId: str
+class Result(BaseResult):
     roundTypeId: str
-    personName: str
-    personId: str
-    personCountryId: str
-    value1: int
-    value2: int
-    value3: int
-    wcaRecord: str
     wcaPos: int
-    score1: float
-    score2: float
-    score3: float
-    best_score: float
-    best_result: int
-    continentId: str
-    startdate: date
-    regionalRecord: str
     pos: int
 
 
