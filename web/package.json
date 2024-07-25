@@ -20,7 +20,8 @@
     "react-router-dom": "^6.22.0"
   },
   "devDependencies": {
-    "@parcel/transformer-less": "^2.11.0",
+    "@parcel/transformer-less": "^2.12.0",
+    "@parcel/transformer-svg-react": "^2.12.0",
     "@types/node": "^20.11.16",
     "@types/react": "^18.2.55",
     "@types/react-dom": "^18.2.19",
@@ -28,7 +29,7 @@
     "@types/react-router-hash-link": "^2.4.9",
     "assert": "^2.1.0",
     "console-browserify": "^1.2.0",
-    "parcel": "^2.11.0",
+    "parcel": "^2.12.0",
     "prettier": "^3.2.5",
     "process": "^0.11.10",
     "typescript": "^5.3.3",

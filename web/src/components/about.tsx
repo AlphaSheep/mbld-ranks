@@ -1,6 +1,10 @@
 import React from "react";
 
+import Equation from "jsx:../assets/equation.svg";
+
 import "./about.less";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faExternalLinkAlt } from "@fortawesome/free-solid-svg-icons";
 
 export default function About() {
   return (
@@ -12,6 +16,9 @@ export default function About() {
 
         <div>score = solved * (accuracy) / sqrt(time_used)</div>
       </div>
+
+      <Equation className="equation-image" />
+
       <p>
         This system is specifically designed to balance rewarding larger
         attempts, higher accuracy, and faster times. It was informed by a
@@ -25,6 +32,9 @@ export default function About() {
         target="_blank"
         rel="noreferrer"
       >
+        <div className="external-icon">
+          <FontAwesomeIcon icon={faExternalLinkAlt} />
+        </div>
         <h3 className="article-title">
           Ranking Multiple Blindfolded Rubik's Cube Solves
         </h3>
