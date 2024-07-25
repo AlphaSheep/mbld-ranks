@@ -3,7 +3,6 @@ import PageLayout from "../layouts/page-layout";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  faExternalLinkAlt,
   faTrophy,
   faUser,
   faChartLine,
