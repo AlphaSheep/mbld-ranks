@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from datetime import date
+from datetime import date, datetime
 
 
 @dataclass
@@ -82,9 +82,10 @@ class Continent:
     name: str
     recordName: str
 
+
 @dataclass
 class Metadata:
-    updated_at: date
+    updated_at: datetime
 
 
 @dataclass
