@@ -1,11 +1,21 @@
-from typing import Type, TypeVar
+from typing import Literal, Type, TypeVar
 
 import os
 from functools import cache
 import duckdb
 import dbqueries as db
 
-from schema import Competition, Continent, Country, Metadata, Person, Ranking, Result, RoundType
+
+from schema import (
+    Competition,
+    Continent,
+    Country,
+    Metadata,
+    Person,
+    Ranking,
+    Result,
+    RoundType,
+)
 
 
 DUCKDB = os.getenv("DUCKDB_FILE", ":memory:")
@@ -32,7 +42,7 @@ def _fetch_structured_data(query: str, result_type: Type[T], params=()) -> list[
         return [result_type(**dict(zip(columns, row))) for row in data]
 
 
-def fetch_string_list(query: str, params=()) -> list[str]:
+def _fetch_string_list(query: str, params=()) -> list[str]:
     with duckdb.connect(DUCKDB) as conn:
         cursor = conn.execute(query, params)
         data = cursor.fetchall()
@@ -90,21 +100,36 @@ def fetch_person_by_id(person_id: str) -> Person:
 
 
 def fetch_results_by_person_id(person_id: str) -> list[Result]:
-    results = _fetch_structured_data(db.SELECT_RESULT_BY_PERSON_ID, Result, (person_id,))
+    results = _fetch_structured_data(
+        db.SELECT_RESULT_BY_PERSON_ID, Result, (person_id,)
+    )
     if not results:
         raise NotFoundError(f"Results for person with id {person_id} not found")
     return results
 
 
-def fetch_ranking_for_person(person_id: str) -> list[Ranking]:
-    rankings = _fetch_structured_data(db.SELECT_RANKING_BY_PERSON_ID, Ranking, (person_id,))
+def fetch_single_ranking_for_person(person_id: str) -> list[Ranking]:
+    rankings = _fetch_structured_data(
+        db.SELECT_SINGLE_RANKING_BY_PERSON_ID, Ranking, (person_id,)
+    )
     if not rankings:
         raise NotFoundError(f"Rankings for person with id {person_id} not found")
     return rankings
 
 
+def fetch_mean_ranking_for_person(person_id: str) -> list[Ranking]:
+    rankings = _fetch_structured_data(
+        db.SELECT_MEAN_RANKING_BY_PERSON_ID, Ranking, (person_id,)
+    )
+    if not rankings:
+        raise NotFoundError(f"Mean rankings for person with id {person_id} not found")
+    return rankings
+
+
 def fetch_competition_by_id(competition_id: str) -> Competition:
-    competitions = _fetch_structured_data(db.SELECT_COMPETITION_BY_ID, Competition, (competition_id,))
+    competitions = _fetch_structured_data(
+        db.SELECT_COMPETITION_BY_ID, Competition, (competition_id,)
+    )
     if not competitions:
         raise NotFoundError(f"Competition with id {competition_id} not found")
     return competitions[0]
@@ -113,53 +138,97 @@ def fetch_competition_by_id(competition_id: str) -> Competition:
 def fetch_competitions_matching_query(query: str) -> list[Competition]:
     if (not query) or (len(query) < 3):
         raise InvalidRequestError("Query must be at least 3 characters long")
-    return _fetch_structured_data(db.SELECT_COMPETITION_SEARCH, Competition, (f"%{query.lower()}%",)*3)
+    return _fetch_structured_data(
+        db.SELECT_COMPETITION_SEARCH, Competition, (f"%{query.lower()}%",) * 3
+    )
 
 
 def fetch_results_by_competition_id(competition_id: str) -> list[Result]:
-    results = _fetch_structured_data(db.SELECT_RESULT_BY_COMPETITION_ID, Result, (competition_id,))
+    results = _fetch_structured_data(
+        db.SELECT_RESULT_BY_COMPETITION_ID, Result, (competition_id,)
+    )
     if not results:
-        raise NotFoundError(f"Results for competition with id {competition_id} not found")
+        raise NotFoundError(
+            f"Results for competition with id {competition_id} not found"
+        )
     return results
 
 
+def get_rankings_query(region: str, single_or_mean: Literal["single", "mean"]) -> str:
+    match single_or_mean:
+        case "single":
+            if region in fetch_continent_ids():
+                return db.SELECT_CONTINENT_SINGLE_RANKINGS
+            if region in fetch_country_ids():
+                return db.SELECT_COUNTRY_SINGLE_RANKINGS
+            raise NotFoundError(f"Region with id {region} not found")
+        case "mean":
+            if region in fetch_continent_ids():
+                return db.SELECT_CONTINENT_MEAN_RANKINGS
+            if region in fetch_country_ids():
+                return db.SELECT_COUNTRY_MEAN_RANKINGS
+            raise NotFoundError(f"Region with id {region} not found")
+        case _:
+            raise ValueError(
+                f"Invalid value for single_or_mean: {single_or_mean}. This should not happen."
+            )
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-def fetch_ranking_by_region(region: str, page: int = 1) -> list[Ranking]:
+def fetch_single_ranking_by_region(region: str, page: int = 1) -> list[Ranking]:
     PAGE_SIZE = 100
 
     limits = (page - 1) * PAGE_SIZE, page * PAGE_SIZE
 
     if region == "world":
-        return _fetch_structured_data(db.SELECT_WORLD_RANKINGS, Ranking, limits)
+        return _fetch_structured_data(db.SELECT_WORLD_SINGLE_RANKINGS, Ranking, limits)
+    else:
+        query = get_rankings_query(region, "single")
+        return _fetch_structured_data(query, Ranking, (region, *limits))
+
+
+def fetch_mean_ranking_by_region(region: str, page: int = 1) -> list[Ranking]:
+    PAGE_SIZE = 100
+
+    limits = (page - 1) * PAGE_SIZE, page * PAGE_SIZE
+
+    if region == "world":
+        return _fetch_structured_data(db.SELECT_WORLD_MEAN_RANKINGS, Ranking, limits)
+    else:
+        query = get_rankings_query(region, "mean")
+        return _fetch_structured_data(query, Ranking, (region, *limits))
+
+
+def fetch_record_single_history_by_region(region: str) -> list[Result]:
+    if region == "world":
+        return _fetch_structured_data(db.SELECT_WORLD_RECORD_SINGLE_HISTORY, Result)
     if region in fetch_continent_ids():
-        return _fetch_structured_data(db.SELECT_CONTINENT_RANKINGS, Ranking, (region, *limits))
+        recordName = fetch_record_id_for_continent(region)
+        return _fetch_structured_data(
+            db.SELECT_CONTINENT_RECORD_SINGLE_HISTORY,
+            Result,
+            (region, recordName, recordName),
+        )
     if region in fetch_country_ids():
-        return _fetch_structured_data(db.SELECT_COUNTRY_RANKINGS, Ranking, (region, *limits))
+        return _fetch_structured_data(
+            db.SELECT_COUNTRY_RECORD_SINGLE_HISTORY, Result, (region,)
+        )
     raise NotFoundError(f"Region with id {region} not found")
 
 
-def fetch_record_history_by_region(region: str) -> list[Result]:
+def fetch_record_mean_history_by_region(region: str) -> list[Result]:
     if region == "world":
-        return _fetch_structured_data(db.SELECT_WORLD_RECORD_HISTORY, Result)
+        return _fetch_structured_data(db.SELECT_WORLD_RECORD_MEAN_HISTORY, Result)
     if region in fetch_continent_ids():
         recordName = fetch_record_id_for_continent(region)
-        return _fetch_structured_data(db.SELECT_CONTINENT_RECORD_HISTORY, Result, (region, recordName, recordName))
+        return _fetch_structured_data(
+            db.SELECT_CONTINENT_RECORD_MEAN_HISTORY,
+            Result,
+            (region, recordName),
+        )
     if region in fetch_country_ids():
-        return _fetch_structured_data(db.SELECT_COUNTRY_RECORD_HISTORY, Result, (region,))
+        return _fetch_structured_data(
+            db.SELECT_COUNTRY_RECORD_MEAN_HISTORY, Result, (region,)
+        )
     raise NotFoundError(f"Region with id {region} not found")
 
 

@@ -8,7 +8,7 @@ from slowapi.util import get_remote_address
 from slowapi.errors import RateLimitExceeded
 from slowapi.middleware import SlowAPIMiddleware
 
-from controller import InvalidRequestError, NotFoundError, fetch_competition_by_id, fetch_countries, fetch_continent_ids, fetch_metadata, fetch_person_by_id, fetch_ranking_by_region, fetch_ranking_for_person, fetch_record_history_by_region, fetch_results_by_competition_id, fetch_results_by_person_id, fetch_round_types, fetch_competitions_matching_query
+from controller import InvalidRequestError, NotFoundError, fetch_competition_by_id, fetch_countries, fetch_continent_ids, fetch_mean_ranking_by_region, fetch_mean_ranking_for_person, fetch_metadata, fetch_person_by_id, fetch_record_mean_history_by_region, fetch_single_ranking_by_region, fetch_single_ranking_for_person, fetch_record_single_history_by_region, fetch_results_by_competition_id, fetch_results_by_person_id, fetch_round_types, fetch_competitions_matching_query
 from schema import Competition, Country, ErrorMessage, Person, Ranking, Result, RoundType, Metadata
 
 
@@ -69,12 +69,20 @@ async def get_results_for_person(wca_id: str) -> list[Result]:
     return fetch_results_by_person_id(wca_id)
 
 
-@app.get("/api/v0/person/ranking/{wca_id}", tags=["People"], responses={**NOT_FOUND})
+@app.get("/api/v0/person/ranking/single/{wca_id}", tags=["People"], responses={**NOT_FOUND})
 async def get_ranking_for_person(wca_id: str) -> list[Ranking]:
     '''
     Get the ranks and best results for a person by WCA ID.
     '''
-    return fetch_ranking_for_person(wca_id)
+    return fetch_single_ranking_for_person(wca_id)
+
+
+@app.get("/api/v0/person/ranking/mean/{wca_id}", tags=["People"], responses={**NOT_FOUND})
+async def get_mean_ranking_for_person(wca_id: str) -> list[Ranking]:
+    '''
+    Get the mean ranks and best results for a person by WCA ID.
+    '''
+    return fetch_mean_ranking_for_person(wca_id)
 
 
 @app.get("/api/v0/person/{wca_id}", tags=["People"], responses={**NOT_FOUND})
@@ -141,28 +149,52 @@ async def get_continents(request: Request, response: Response) -> list[str]:
     return fetch_continent_ids()
 
 
-@app.get("/api/v0/ranking/{region}", tags=["Rankings"], responses={**NOT_FOUND})
+@app.get("/api/v0/ranking/single/{region}", tags=["Rankings"], responses={**NOT_FOUND})
 async def get_ranking_for_region(region: str) -> list[Ranking]:
     '''
     Get the top 100 rankings for a region. The region can be 'world' or a continent or country ID.
     '''
-    return fetch_ranking_by_region(region)
+    return fetch_single_ranking_by_region(region)
 
 
-@app.get("/api/v0/ranking/{region}/{page}", tags=["Rankings"], responses={**NOT_FOUND})
+@app.get("/api/v0/ranking/single/{region}/{page}", tags=["Rankings"], responses={**NOT_FOUND})
 async def get_ranking_for_region_for_page(region: str, page: int) -> list[Ranking]:
     '''
     Get paged rankings for a region. The region can be 'world' or a continent or country ID.
     '''
-    return fetch_ranking_by_region(region, page)
+    return fetch_single_ranking_by_region(region, page)
 
 
-@app.get("/api/v0/records/history/{region}", tags=["Records"], responses={**NOT_FOUND})
+@app.get("/api/v0/ranking/mean/{region}", tags=["Rankings"], responses={**NOT_FOUND})
+async def get_mean_rankings_for_region(region: str) -> list[Ranking]:
+    '''
+    Get the mean rankings for a region. The region can be 'world' or a continent or country ID.
+    '''
+    return fetch_mean_ranking_by_region(region)
+
+
+@app.get("/api/v0/ranking/mean/{region}/{page}", tags=["Rankings"], responses={**NOT_FOUND})
+async def get_mean_rankings_for_region_for_page(region: str, page: int) -> list[Ranking]:
+    '''
+    Get paged mean rankings for a region. The region can be 'world' or a continent or country ID.
+    '''
+    return fetch_mean_ranking_by_region(region, page)
+
+
+@app.get("/api/v0/records/history/single/{region}", tags=["Records"], responses={**NOT_FOUND})
 async def get_records_history(region: str) -> list[Result]:
     '''
     Get the record history for a region. The region can be 'world' or a continent or country ID.
     '''
-    return fetch_record_history_by_region(region)
+    return fetch_record_single_history_by_region(region)
+
+
+@app.get("/api/v0/records/history/mean/{region}", tags=["Records"], responses={**NOT_FOUND})
+async def get_mean_records_history(region: str) -> list[Result]:
+    '''
+    Get the mean record history for a region. The region can be 'world' or a continent or country ID.
+    '''
+    return fetch_record_mean_history_by_region(region)
 
 
 @app.get("/api/v0/metadata", tags=["Metadata"])
