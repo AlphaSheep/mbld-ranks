@@ -1,0 +1,40 @@
+@import (less) "../variables.less";
+
+.single-mean-select {
+  display: flex;
+  flex-direction: row;
+  padding: 1em;
+
+  button {
+    padding: 0.3em 1.5em;
+    font-weight: 600;
+    font-size: 100%;
+    white-space: nowrap;
+
+    transition: all 0.3s ease;
+
+    color: @inactive-button-text-color;
+    background-color: @inactive-button-background-color;
+    border: 1px solid @inactive-button-border-color;
+
+    &.selected {
+      color: @selected-button-text-color;
+      background-color: @selected-button-background-color;
+      border: 1px solid @selected-button-border-color;
+    }
+  }
+
+  button:first-child {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    border-top-left-radius: 0.4em;
+    border-bottom-left-radius: 0.4em;
+  }
+
+  button:last-child {
+    border-top-right-radius: 0.4em;
+    border-bottom-right-radius: 0.4em;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+  }
+}
