@@ -1,0 +1,26 @@
+@import (less) '../variables.less';
+
+.person-rank-table {
+  width: 100%;
+  border-collapse: collapse;
+  border-spacing: 0;
+  margin: 3em 0 2em;
+
+  border-top: 1px solid @table-border-color;
+
+  th {
+    padding: 0.6em;
+    text-align: center;
+  }
+
+  td {
+    padding: 0.6em;
+    text-align: center;
+
+    &.rank {
+      text-align: right;
+      font-weight: bold;
+      text-align: center;
+    }
+  }
+}

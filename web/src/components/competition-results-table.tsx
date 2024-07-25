@@ -1,13 +1,14 @@
 import React from "react";
 import Result from "../interfaces/result";
 import FormattedResult from "./formatted-result";
-import RecordTag from "./record-tag";
+import RecordTag, { RecordTagForMean } from "./record-tag";
 import { resultsService } from "../services/results-service";
 import PersonLink from "./person-link";
 
 import "./results-table.less";
 import RankMovementTag from "./rank-movement-tag";
 import { TagLegend } from "./tag-legend";
+import FormattedMean from "./formatted-mean";
 
 export default function CompetitionResultsTable({ results }: { results: Result[] }) {
 
@@ -42,8 +43,14 @@ export default function CompetitionResultsTable({ results }: { results: Result[]
                     <PersonLink personId={result.personId} personName={result.personName} personCountryId={result.personCountryId} />
                   </td>
                   <td>
-                    <FormattedResult value={result.best_result} score={result.best_score} />
-                    <RecordTag result={result} />
+                  <div className="result-best-single">
+                      <FormattedResult value={result.best_result} score={result.best_score} />
+                      <RecordTag result={result} />
+                    </div>
+                    <div className="result-mean">
+                      <FormattedMean result={result} />
+                      <RecordTagForMean result={result} />
+                    </div>
                   </td>
                   <td className="individual-results-list drop-if-small">
                     <div><FormattedResult value={result.value1} score={result.score1} /></div>

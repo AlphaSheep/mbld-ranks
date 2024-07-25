@@ -7,7 +7,16 @@ import "./record-tag.less";
 export default function RecordTag({ result }: { result: Result | Ranking }) {
   const oldRecord = result.wcaRecord;
   const newRecord = result.regionalRecord;
+  return <RecordTagDifference oldRecord={oldRecord} newRecord={newRecord} />;
+}
 
+export function RecordTagForMean({ result }: { result: Result | Ranking }) {
+  const oldRecord = "";
+  const newRecord = result.regionalMeanRecord;
+  return <RecordTagDifference oldRecord={oldRecord} newRecord={newRecord} />;
+}
+
+function RecordTagDifference({ oldRecord, newRecord }: { oldRecord: string, newRecord: string }) {
   if ((!oldRecord || oldRecord === "") && (!newRecord || newRecord === "")) {
     return null;
   }
@@ -17,22 +26,23 @@ export default function RecordTag({ result }: { result: Result | Ranking }) {
 
   if (oldLevel > newLevel) {
     return <span className="record-tag downgraded-record">
-      <span className="replaced-record">{result.wcaRecord}</span>
-      {newLevel ? " " + result.regionalRecord : ""}
+      <span className="replaced-record">{oldRecord}</span>
+      {newLevel ? " " + newRecord : ""}
     </span>;
   }
 
   if (oldLevel < newLevel) {
     return <span className="record-tag upgraded-record">
-      {oldLevel ? <><span className="replaced-record">{result.wcaRecord}</span> </> : ""}
-      {result.regionalRecord}
+      {oldLevel ? <><span className="replaced-record">{oldRecord}</span> </> : ""}
+      {newRecord}
     </span>;
   }
 
   return <span className="record-tag">
-    {result.regionalRecord}
+    {newRecord}
   </span>;
 }
+
 
 function getRecordLevel(record: string): number {
   if (!record || record === "") {

@@ -1,13 +1,13 @@
 import React from "react";
 
-export default function FormattedResult({ value, score }: { value: number, score: number }) {
+export default function FormattedResult({ value, score }: { value: number | undefined, score: number | undefined}) {
   return <span>
     {formatResult(value, score)}
   </span>;
 }
 
-function formatResult(value: number, score: number): string {
-  if (value === 0) return "";
+function formatResult(value: number | undefined, score: number | undefined): string {
+  if (value === 0 || value === undefined || score === undefined) return "";
   if (value === -1) return "DNF";
   if (value === -2) return "DNS";
 

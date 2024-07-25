@@ -6,19 +6,29 @@ import { PersonContext } from "../contexts/person-context";
 import PersonDetails from "../components/person-details";
 import PersonResultsTable from "../components/person-results-table";
 
-
-export default function PersonPage () {
+export default function PersonPage() {
   const [query, setQuery] = useSearchParams();
 
-  const [wcaId, setWcaId] = useState<string>('');
+  const [wcaId, setWcaId] = useState<string>("");
   const [validWcaId, setValidWcaId] = useState<boolean>(false);
 
   const context = useContext(PersonContext);
   if (!context) {
-    throw new Error('PersonContext is not available');
+    throw new Error("PersonContext is not available");
   }
 
-  const { person, getPerson, loadingPerson, personRanks, getPersonRanks, results, getResults, loadingResults } = context;
+  const {
+    person,
+    getPerson,
+    loadingPerson,
+    personSingleRanks,
+    getPersonSingleRanks,
+    personMeanRanks,
+    getPersonMeanRanks,
+    results,
+    getResults,
+    loadingResults,
+  } = context;
 
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = e.target.value.toUpperCase();
@@ -33,28 +43,43 @@ export default function PersonPage () {
   const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     getPerson(wcaId);
-    getPersonRanks(wcaId);
+    getPersonSingleRanks(wcaId);
+    getPersonMeanRanks(wcaId);
     getResults(wcaId);
     setQuery({ wcaid: wcaId });
   };
 
-  return <PageLayout>
+  return (
+    <PageLayout>
+      <form onSubmit={onSubmit}>
+        <div className={"wca-id-input " + (validWcaId ? "valid" : "invalid")}>
+          <input
+            type="text"
+            placeholder="WCA ID"
+            value={wcaId}
+            onChange={onChange}
+          />
+          <button>GO</button>
+        </div>
+      </form>
 
-    <form onSubmit={onSubmit}>
-      <div className={"wca-id-input "+(validWcaId ? 'valid' : 'invalid')}>
-        <input type="text" placeholder="WCA ID" value={wcaId} onChange={onChange} />
-        <button>GO</button>
-      </div>
-    </form>
+      {person ? null : <p>Enter a WCA ID to get started</p>}
 
-    {person ? null : <p>Enter a WCA ID to get started</p>}
+      {loadingPerson ? (
+        <div>Loading person...</div>
+      ) : (
+        <PersonDetails
+          person={person}
+          personSingleRanks={personSingleRanks}
+          personMeanRanks={personMeanRanks}
+        />
+      )}
 
-    {loadingPerson ? <div>Loading person...</div> :
-      <PersonDetails person={person} personRanks={personRanks} />
-    }
-
-    {loadingResults ? <div>Loading results...</div> :
-      <PersonResultsTable results={results} />
-    }
-  </PageLayout>;
+      {loadingResults ? (
+        <div>Loading results...</div>
+      ) : (
+        <PersonResultsTable results={results} />
+      )}
+    </PageLayout>
+  );
 }

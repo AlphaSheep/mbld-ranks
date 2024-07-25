@@ -7,8 +7,26 @@
     div {
       color: @text-color-muted;
       font-style: italic;
+      font-size: smaller;
       padding: 0;
       padding-bottom: 0.25em;
     }
+  }
+
+  .mean-score {
+    font-size: smaller;
+    font-style: italic;
+    color: @text-color-muted;
+  }
+
+  .result-best-single, .result-mean {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: start;
+  }
+
+  .result-mean {
+    margin-top: 1em;
   }
 }
