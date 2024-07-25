@@ -254,6 +254,9 @@ def _get_rankings_by_field(
     rankings["wcaWorldRank"] = rankings["wcaWorldRank"].astype("Int64")
     rankings["wcaContinentRank"] = rankings["wcaContinentRank"].astype("Int64")
     rankings["wcaCountryRank"] = rankings["wcaCountryRank"].astype("Int64")
+    rankings["worldRank"] = rankings["worldRank"].astype("Int64")
+    rankings["continentRank"] = rankings["continentRank"].astype("Int64")
+    rankings["countryRank"] = rankings["countryRank"].astype("Int64")
 
     return rankings
 

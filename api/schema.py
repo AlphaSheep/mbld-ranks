@@ -24,13 +24,14 @@ class BaseResult:
     score3: float
 
 
+@dataclass
 class Ranking(BaseResult):
-    worldRank: int | None
-    continentRank: int | None
-    countryRank: int | None
-    wcaWorldRank: int | None
-    wcaContinentRank: int | None
-    wcaCountryRank: int | None
+    worldRank: int | None = None
+    continentRank: int | None = None
+    countryRank: int | None = None
+    wcaWorldRank: int | None = None
+    wcaContinentRank: int | None = None
+    wcaCountryRank: int | None = None
 
 
 @dataclass
@@ -45,7 +46,7 @@ class RoundType:
     id: str
     name: str
     cellName: str
-    rank: str
+    rank: int
     final: int
 
 
