@@ -7,9 +7,17 @@ export default interface Ranking {
   wcaPos: number;
   best_score: number;
   best_result: number;
+  mean_score: number | undefined;
+  value1: number | undefined;
+  value2: number | undefined;
+  value3: number | undefined;
+  score1: number | undefined;
+  score2: number | undefined;
+  score3: number | undefined;
   continentId: string;
   startdate: Date;
   regionalRecord: string;
+  regionalMeanRecord: string;
   pos: number;
   worldRank: number;
   continentRank: number;

@@ -11,9 +11,12 @@ interface PersonContextProps {
   person: Person | undefined;
   getPerson: (wcaId: string) => void;
   loadingPerson: boolean;
-  personRanks: Ranking | undefined;
-  getPersonRanks: (wcaId: string) => void;
-  loadingPersonRanks: boolean;
+  personSingleRanks: Ranking | undefined;
+  getPersonSingleRanks: (wcaId: string) => void;
+  loadingPersonSingleRanks: boolean;
+  personMeanRanks: Ranking | undefined;
+  getPersonMeanRanks: (wcaId: string) => void;
+  loadingPersonMeanRanks: boolean;
   results: Result[];
   getResults: (wcaId: string) => void;
   loadingResults: boolean;
@@ -27,10 +30,12 @@ export default function PersonProvider({ children }) {
   const [query, setQuery] = useSearchParams();
 
   const [person, setPerson] = useState<Person | undefined>(undefined);
-  const [personRanks, setPersonRanks] = useState<Ranking | undefined>(undefined);
+  const [personSingleRanks, setPersonSingleRanks] = useState<Ranking | undefined>(undefined);
+  const [personMeanRanks, setPersonMeanRanks] = useState<Ranking | undefined>(undefined);
   const [results, setResults] = useState<Result[]>([]);
   const [loadingPerson, setLoadingPerson] = useState<boolean>(false);
-  const [loadingPersonRanks, setLoadingPersonRanks] = useState<boolean>(false);
+  const [loadingPersonSingleRanks, setLoadingPersonSingleRanks] = useState<boolean>(false);
+  const [loadingPersonMeanRanks, setLoadingPersonMeanRanks] = useState<boolean>(false);
   const [loadingResults, setLoadingResults] = useState<boolean>(false);
 
   const getPerson = async (wcaId: string) => {
@@ -46,17 +51,30 @@ export default function PersonProvider({ children }) {
     }
   };
 
-  const getPersonRanks = async (wcaId: string) => {
-    setLoadingPersonRanks(true);
+  const getPersonSingleRanks = async (wcaId: string) => {
+    setLoadingPersonSingleRanks(true);
     try {
-      const personRanks = await resultsService.getPersonDetails(wcaId);
-      setPersonRanks(personRanks);
+      const personRanks = await resultsService.getPersonSingleRanks(wcaId);
+      setPersonSingleRanks(personRanks);
 
     } catch (error) {
       console.error(error);
-      setPersonRanks(undefined);
+      setPersonSingleRanks(undefined);
     } finally {
-      setLoadingPersonRanks(false);
+      setLoadingPersonSingleRanks(false);
+    }
+  }
+
+  const getPersonMeanRanks = async (wcaId: string) => {
+    setLoadingPersonMeanRanks(true);
+    try {
+      const personRanks = await resultsService.getPersonMeanRanks(wcaId);
+      setPersonMeanRanks(personRanks);
+    } catch (error) {
+      console.error(error);
+      setPersonMeanRanks(undefined);
+    } finally {
+      setLoadingPersonMeanRanks(false);
     }
   }
 
@@ -76,7 +94,8 @@ export default function PersonProvider({ children }) {
   useEffect(() => {
     const wcaId = query.get('wcaid');
     if (wcaId) {
-      getPersonRanks(wcaId);
+      getPersonSingleRanks(wcaId);
+      getPersonMeanRanks(wcaId);
       getPerson(wcaId);
       getResults(wcaId);
     }
@@ -87,9 +106,12 @@ export default function PersonProvider({ children }) {
       person,
       getPerson,
       loadingPerson,
-      personRanks,
-      getPersonRanks,
-      loadingPersonRanks,
+      personSingleRanks,
+      getPersonSingleRanks,
+      loadingPersonSingleRanks,
+      personMeanRanks,
+      getPersonMeanRanks,
+      loadingPersonMeanRanks,
       results,
       getResults,
       loadingResults

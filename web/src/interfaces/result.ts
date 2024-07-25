@@ -14,8 +14,10 @@ export default interface Result {
   score3: number;
   best_score: number;
   best_result: number;
+  mean_score: number | null;
   continentId: string;
   startdate: Date;
   regionalRecord: string;
+  regionalMeanRecord: string;
   pos: number;
 }
