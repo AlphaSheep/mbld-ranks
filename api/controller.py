@@ -1,6 +1,7 @@
 from typing import Type, TypeVar
 
 import os
+from functools import cache
 import duckdb
 import dbqueries as db
 
@@ -16,9 +17,9 @@ T = TypeVar("T")
 class NotFoundError(Exception):
     pass
 
+
 class InvalidRequestError(Exception):
     pass
-
 
 
 def _fetch_structured_data(query: str, result_type: Type[T], params=()) -> list[T]:
@@ -40,23 +41,45 @@ def fetch_string_list(query: str, params=()) -> list[str]:
         return [row[0] for row in data]
 
 
+@cache
 def fetch_countries() -> list[Country]:
     return _fetch_structured_data(db.SELECT_COUNTRIES, Country)
 
 
-def fetch_continent() -> list[Continent]:
+@cache
+def fetch_continents() -> list[Continent]:
     return _fetch_structured_data(db.SELECT_CONTINENTS, Continent)
 
 
+@cache
 def fetch_round_types() -> list[RoundType]:
     return _fetch_structured_data(db.SELECT_ROUND_TYPES, RoundType)
 
 
+@cache
+def fetch_continent_ids() -> list[str]:
+    return _fetch_string_list(db.SELECT_CONTINENT_IDS)
+
+
+@cache
+def fetch_country_ids() -> list[str]:
+    return _fetch_string_list(db.SELECT_COUNTRY_IDS)
+
+
+@cache
 def fetch_country_by_id(country_id: str) -> Country:
     countries = _fetch_structured_data(db.SELECT_COUNTRY_BY_ID, Country, (country_id,))
     if not countries:
         raise NotFoundError(f"Country with id {country_id} not found")
     return countries[0]
+
+
+@cache
+def fetch_record_id_for_continent(continent: str) -> str:
+    record = _fetch_string_list(db.SELECT_RECORD_ID_FOR_CONTINENT, (continent,))
+    if not record:
+        raise NotFoundError(f"Continent with id {continent} not found")
+    return record[0]
 
 
 def fetch_person_by_id(person_id: str) -> Person:
@@ -100,19 +123,19 @@ def fetch_results_by_competition_id(competition_id: str) -> list[Result]:
     return results
 
 
-def fetch_continent_ids() -> list[str]:
-    return fetch_string_list(db.SELECT_CONTINENT_IDS)
 
 
-def fetch_record_id_for_continent(continent: str) -> str:
-    record = fetch_string_list(db.SELECT_RECORD_ID_FOR_CONTINENT, (continent,))
-    if not record:
-        raise NotFoundError(f"Continent with id {continent} not found")
-    return record[0]
 
 
-def fetch_country_ids() -> list[str]:
-    return fetch_string_list(db.SELECT_COUNTRY_IDS)
+
+
+
+
+
+
+
+
+
 
 
 def fetch_ranking_by_region(region: str, page: int = 1) -> list[Ranking]:
