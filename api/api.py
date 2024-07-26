@@ -34,7 +34,7 @@ app = FastAPI(
 )
 
 
-limiter = Limiter(key_func=get_remote_address, application_limits=["50/30 seconds"], headers_enabled=True)
+limiter = Limiter(key_func=get_remote_address, application_limits=["50/15 seconds"], headers_enabled=True)
 app.state.limiter = limiter
 
 app.add_middleware(SlowAPIMiddleware)
