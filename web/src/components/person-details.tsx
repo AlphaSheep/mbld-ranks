@@ -7,6 +7,7 @@ import { resultsService } from "../services/results-service";
 
 import "./person-details.less";
 import PersonRanksTable from "./person-ranks-table";
+import PersonBestsTable from "./person-bests-table";
 
 export default function PersonDetails({
   person,
@@ -35,6 +36,11 @@ export default function PersonDetails({
       <p>
         <CountryWithFlag countryId={person?.countryId} />
       </p>
+
+      <PersonBestsTable
+        personSingleRanks={personSingleRanks}
+        personMeanRanks={personMeanRanks}
+      />
 
       <PersonRanksTable
         personSingleRanks={personSingleRanks}

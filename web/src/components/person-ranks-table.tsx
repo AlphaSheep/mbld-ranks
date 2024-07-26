@@ -25,44 +25,13 @@ export default function PersonRanksTable({
         <tr>
           <th>Single</th>
           <th></th>
-          <th></th>
           {personMeanRanks?.worldRank && <th>Mean</th>}
         </tr>
       </thead>
       <tbody>
-
         <tr>
-          <td>
-            <FormattedResult
-              value={personSingleRanks?.best_result}
-              score={personSingleRanks?.best_score}
-            />
-          </td>
-          <td></td>
-          <td></td>
-          {personMeanRanks?.worldRank && (
-            <td>
-              <FormattedMeanWithResults result={personMeanRanks} />
-            </td>
-          )}
-        </tr>
-
-        <tr>
-          <td>
-            <CompetitionLinkForResult result={personSingleRanks} />
-          </td>
-          <td></td>
-          <td></td>
-          {personMeanRanks?.worldRank && (
-            <td>
-              <CompetitionLinkForResult result={personMeanRanks} />
-            </td>
-          )}
-        </tr>
-
-        <tr>
-          <td className="rank">{personSingleRanks?.worldRank || "--"}</td>
-          <td>
+          <td className="rank">
+            {personSingleRanks?.worldRank || "--"}
             <RankMovementTag
               oldRank={personSingleRanks?.wcaWorldRank}
               newRank={personSingleRanks?.worldRank}
@@ -76,8 +45,8 @@ export default function PersonRanksTable({
           )}
         </tr>
         <tr>
-          <td className="rank">{personSingleRanks?.continentRank || "--"}</td>
-          <td>
+          <td className="rank">
+            {personSingleRanks?.continentRank || "--"}
             <RankMovementTag
               oldRank={personSingleRanks?.wcaContinentRank}
               newRank={personSingleRanks?.continentRank}
@@ -94,8 +63,8 @@ export default function PersonRanksTable({
           )}
         </tr>
         <tr>
-          <td className="rank">{personSingleRanks?.countryRank || "--"}</td>
-          <td>
+          <td className="rank">
+            {personSingleRanks?.countryRank || "--"}
             <RankMovementTag
               oldRank={personSingleRanks?.wcaCountryRank}
               newRank={personSingleRanks?.countryRank}
@@ -111,7 +80,6 @@ export default function PersonRanksTable({
             <td className="rank">{personMeanRanks?.countryRank || "--"}</td>
           )}
         </tr>
-
       </tbody>
     </table>
   );
