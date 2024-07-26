@@ -7,6 +7,7 @@ COPY package.json package-lock.json ./
 RUN npm ci
 
 COPY ./src ./src
+COPY .parcelrc ./
 
 RUN npm run build
 
