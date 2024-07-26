@@ -46,6 +46,7 @@ export default function RankingsProvider({ children }) {
     const region = query.get('region') || "world";
     const meanType = query.get('type') as MeanType || MeanType.Single;
     setRegion(region);
+    setMeanType(meanType);
     getRankings(region, meanType, page);
   }, [region, page, meanType]);
 
