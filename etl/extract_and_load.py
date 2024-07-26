@@ -36,6 +36,7 @@ _CONTINENTS_IMPORT_QUERY = """
         name,
         recordName
     FROM Continents
+    WHERE id <> '_Multiple Continents'
 """
 
 _COMPETITIONS_IMPORT_QUERY = """
