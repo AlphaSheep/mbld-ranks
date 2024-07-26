@@ -166,6 +166,8 @@ class ResultsService {
   }
 
   public async batchGetCompetition(ids: string[]): Promise<CompetitionDict> {
+    if (ids.length === 0) return {};
+
     let idsToFetch: string[] = [];
     ids.forEach((id) => {
       if (!this._competitionDetails[id]) {

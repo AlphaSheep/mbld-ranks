@@ -8,10 +8,12 @@ export default function useCompetitionDetails(results: Result[] | Ranking[]): Co
 
   const [compDetails, setCompDetails] = useState<CompetitionDict>({});
 
+  const compIds = results.map(result => result.competitionId);
+
   useEffect(()=>{
-    resultsService.batchGetCompetition(results.map(result => result.competitionId))
+    resultsService.batchGetCompetition(compIds)
     .then(setCompDetails);
-  }, [results]);
+  }, []);
 
   return compDetails;
 }
