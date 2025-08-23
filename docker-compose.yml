@@ -7,7 +7,7 @@ services:
     volumes:
       - ./data:/data
     networks:
-      - wca-db-network
+      - wca-open-db-network
 
   mbld-ranks-api:
     build: ./api
@@ -29,9 +29,24 @@ services:
     networks:
       - mbld-ranks-network
 
+  wca-open-db:
+    image: ghcr.io/alphasheep/wca-open-db:latest
+    container_name: wca-open-db
+    env_file: .env
+    environment:
+      - IMPORT_WCA_DB_ON_STARTUP=true  # Optional: import latest WCA DB on startup
+    ports:
+      - "127.0.0.1:3306:3306"
+    volumes:
+      - wca-open-db-data:/var/lib/mysql
+    networks:
+      - wca-open-db-network
+
+volumes:
+  wca-open-db-data:
+
 networks:
   mbld-ranks-network:
     driver: bridge
-  wca-db-network:
-    name: wca-db-network
-    external: true
+  wca-open-db-network:
+    name: wca-open-db-network
