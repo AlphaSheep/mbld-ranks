@@ -57,7 +57,13 @@ You will also need an instance MySQL or MariaDB running with the [WCA results ex
    API_URL=http://localhost:8000/api/v0
    ```
 
-You can change these as appropriate for your setup.
+4. Create a `.env` file in the project root folder with the following contents:
+   ```
+   MARIADB_ROOT_PASSWORD=wca
+   MARIADB_DATABASE=wca
+   ```
+
+Change these as appropriate for your setup.
 
 
 ### Running Locally
