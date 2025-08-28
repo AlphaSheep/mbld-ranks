@@ -1,8 +1,12 @@
-from functools import wraps
+import logging
 import schedule
 import time
+from functools import wraps
 
 from extract_and_load import load_from_mysql_to_duckdb
+
+
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(name)s - %(message)s')
 
 
 def try_and_fail_safely(func):

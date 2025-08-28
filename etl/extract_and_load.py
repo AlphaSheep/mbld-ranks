@@ -1,8 +1,14 @@
+import logging
 import math
 import os
+from functools import cache
+
 import duckdb
 import pandas as pd
 from mysql import connector as mysql
+
+
+_logger = logging.getLogger(__name__)
 
 
 _RESULTS_IMPORT_QUERY = """
@@ -36,7 +42,7 @@ _CONTINENTS_IMPORT_QUERY = """
         name,
         recordName
     FROM Continents
-    WHERE id <> '_Multiple Continents'
+    WHERE recordName != ''
 """
 
 _COMPETITIONS_IMPORT_QUERY = """
@@ -116,10 +122,16 @@ def _fetch_data_from_mysql(query: str) -> pd.DataFrame:
         return pd.read_sql(query, conn)  # type: ignore # expecting _SQLConnection, get MySQLConnectionAbstract
 
 
-def _write_data_to_duckdb(data: pd.DataFrame, table_name: str) -> None:
+@cache
+def _get_duckdb_file() -> str:
     duckdb_file = os.getenv("DUCKDB_FILE")
     if duckdb_file is None:
         duckdb_file = ":memory:"
+    return duckdb_file
+
+
+def _write_data_to_duckdb(data: pd.DataFrame, table_name: str) -> None:
+    duckdb_file = _get_duckdb_file()
 
     with duckdb.connect(duckdb_file) as conn:
         conn.execute(f"DROP TABLE IF EXISTS {table_name}")
@@ -356,46 +368,88 @@ def _add_has_results_for_country(
     return countries
 
 
+def _load_metadata_into_duckdb():
+    metadata_file = os.getenv("WCA_METADATA_FILE", "../wca-metadata/metadata.json")
+    duckdb_file = _get_duckdb_file()
+
+    if not os.path.exists(metadata_file):
+        _logger.warning("Metadata file %s does not exist, skipping metadata load", metadata_file)
+        return
+
+    with duckdb.connect(duckdb_file) as conn:
+        conn.execute("DROP TABLE IF EXISTS metadata")
+        conn.execute(
+            f"CREATE TABLE metadata AS SELECT * FROM read_json_auto('{metadata_file}')"
+        )
+
+
 def load_from_mysql_to_duckdb():
+    _logger.info("Starting load_from_mysql_to_duckdb")
+
+    _logger.info("Fetching countries from WCA MySQL")
     countries = _fetch_data_from_mysql(_COUNTRIES_IMPORT_QUERY)
+    _logger.info("Fetched countries: %d rows", len(countries))
     _write_data_to_duckdb(countries, "countries")
+    _logger.info("Wrote 'countries' to DuckDB")
 
+    _logger.info("Fetching continents from WCA MySQL")
     continents = _fetch_data_from_mysql(_CONTINENTS_IMPORT_QUERY)
+    _logger.info("Fetched continents: %d rows", len(continents))
     _write_data_to_duckdb(continents, "continents")
+    _logger.info("Wrote 'continents' to DuckDB")
 
+    _logger.info("Fetching competitions from WCA MySQL")
     competitions = _fetch_data_from_mysql(_COMPETITIONS_IMPORT_QUERY)
+    _logger.info("Fetched competitions: %d rows", len(competitions))
     _write_data_to_duckdb(competitions, "competitions")
+    _logger.info("Wrote 'competitions' to DuckDB")
 
+    _logger.info("Fetching persons from WCA MySQL")
     persons = _fetch_data_from_mysql(_PERSONS_IMPORT_QUERY)
+    _logger.info("Fetched persons: %d rows", len(persons))
     _write_data_to_duckdb(persons, "persons")
+    _logger.info("Wrote 'persons' to DuckDB")
 
+    _logger.info("Fetching round types from WCA MySQL")
     round_types = _fetch_data_from_mysql(_ROUND_TYPES_IMPORT_QUERY)
+    _logger.info("Fetched round types: %d rows", len(round_types))
     _write_data_to_duckdb(round_types, "round_types")
+    _logger.info("Wrote 'round_types' to DuckDB")
 
+    _logger.info("Fetching WCA single ranks from WCA MySQL")
     wca_ranks = _fetch_data_from_mysql(_GET_WCA_SINGLE_RANKS_QUERY)
+    _logger.info("Fetched WCA ranks: %d rows", len(wca_ranks))
     _write_data_to_duckdb(wca_ranks, "wca_ranks")
+    _logger.info("Wrote 'wca_ranks' to DuckDB")
 
+    _logger.info("Fetching results from WCA MySQL")
     results = _fetch_data_from_mysql(_RESULTS_IMPORT_QUERY)
+    _logger.info("Fetched results: %d rows", len(results))
+
     results = _enhance_results(results, countries, competitions)
     results = _mark_wca_prs(results)
     results = _mark_regional_single_records(results, continents)
     results = _mark_regional_mean_records(results, continents)
     results = _add_competitor_rankings(results)
     _write_data_to_duckdb(results, "results")
+    _logger.info("Wrote 'results' to DuckDB: %d rows", len(results))
 
     countries = _add_has_results_for_country(countries, results)
     _write_data_to_duckdb(countries, "countries")
+    _logger.info("Updated 'countries' with hasResults and wrote to DuckDB")
 
     rankings = _get_rankings(results, wca_ranks)
     _write_data_to_duckdb(rankings, "rankings")
+    _logger.info("Wrote 'rankings' to DuckDB: %d rows", len(rankings))
 
     mean_score_rankings = _get_mean_score_rankings(results, wca_ranks)
     _write_data_to_duckdb(mean_score_rankings, "mean_rankings")
+    _logger.info("Wrote 'mean_rankings' to DuckDB: %d rows", len(mean_score_rankings))
 
-    update_timestamp = _fetch_data_from_mysql(_UPDATE_TIMESTAMP_QUERY)
-    _write_data_to_duckdb(update_timestamp, "metadata")
+    _load_metadata_into_duckdb()
+    _logger.info("Loaded metadata into DuckDB (if present)")
 
-    print(results)
+    _logger.info("Finished load_from_mysql_to_duckdb")
 
 
 if __name__ == "__main__":

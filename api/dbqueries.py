@@ -73,5 +73,5 @@ SELECT_COUNTRY_RECORD_MEAN_HISTORY = """
     AND (regionalMeanRecord <> '' AND regionalMeanRecord <> 'PR')
 """
 
-SELECT_METADATA = "SELECT updated_at FROM metadata"
+SELECT_METADATA = "SELECT export_date AS updated_at FROM metadata"
 
