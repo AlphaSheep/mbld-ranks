@@ -377,6 +377,7 @@ def _load_metadata_into_duckdb():
         return
 
     with duckdb.connect(duckdb_file) as conn:
+        _logger.info("Loading metadata from %s into DuckDB", metadata_file)
         conn.execute("DROP TABLE IF EXISTS metadata")
         conn.execute(
             f"CREATE TABLE metadata AS SELECT * FROM read_json_auto('{metadata_file}')"

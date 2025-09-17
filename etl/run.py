@@ -7,6 +7,7 @@ from extract_and_load import load_from_mysql_to_duckdb
 
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(name)s - %(message)s')
+_logger = logging.getLogger(__name__)
 
 
 def try_and_fail_safely(func):
@@ -15,11 +16,15 @@ def try_and_fail_safely(func):
         try:
             func(*args, **kwargs)
         except Exception as e:
-            print(f"An error occurred: {e}")
+            _logger.error(f"An error occurred: {e}", exc_info=True)
     return wrapper
 
 
-schedule.every().day.at("05:00").do(try_and_fail_safely(load_from_mysql_to_duckdb))
+# Schedule the ETL to run daily at 05:00
+scheduled_job = schedule.every().day.at("05:00").do(try_and_fail_safely(load_from_mysql_to_duckdb))
+
+# Also run the ETL immediately at startup (wrapped to log errors)
+try_and_fail_safely(load_from_mysql_to_duckdb)()
 
 
 while True:
