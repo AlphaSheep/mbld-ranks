@@ -29,7 +29,7 @@
     "@types/react-router-hash-link": "^2.4.9",
     "assert": "^2.1.0",
     "console-browserify": "^1.2.0",
-    "parcel": "^2.12.0",
+    "parcel": "^2.16.1",
     "prettier": "^3.2.5",
     "process": "^0.11.10",
     "typescript": "^5.3.3",
