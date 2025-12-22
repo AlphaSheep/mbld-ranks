@@ -15,23 +15,23 @@ export default function Footer () {
     });
   }, []);
 
-  const apiDocsUrl = `${process.env.API_URL}/docs`;
+  const apiDocsUrl = `${process.env.API_URL || "api/v0"}/docs`;
 
   return <>
     <footer>
       <div>
         <span>
-          Built with 💚 by <a href="https://bgray.dev">Brendan James Gray</a>
+          Built with 💚 by <a href="https://bgray.dev" target="_blank" rel="noreferrer">Brendan James Gray</a>
         </span>
       </div>
 
       <div>
         <span>
-          Based on <a href="https://worldcubeassociation.org/results">WCA results</a>
+          Based on <a href="https://worldcubeassociation.org/results" target="_blank" rel="noreferrer">WCA results</a>
           {updatedAt && <>, last updated on {updatedAt.toDateString()}</>}.
         </span>
         <span>
-          <a href={apiDocsUrl}><strong>API docs</strong></a>
+          <a href={apiDocsUrl} target="_blank" rel="noreferrer"><strong>API docs</strong></a>
         </span>
         <span>
           <a href="https://github.com/AlphaSheep/mbld-ranks" target="_blank" rel="noreferrer">
