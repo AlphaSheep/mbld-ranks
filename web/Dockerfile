@@ -1,15 +1,18 @@
 # Stage 1: Build
-FROM node:20-alpine AS build
+FROM oven/bun:1 AS build
 
 WORKDIR /app
 
-COPY package.json package-lock.json ./
-RUN npm ci
+# We need nodejs for some parcel dependencies
+RUN apt-get update && apt-get install -y nodejs
 
-COPY ./src ./src
+COPY package.json bun.lockb ./
+RUN bun install --frozen-lockfile
+
 COPY .parcelrc ./
+COPY ./src ./src
 
-RUN npm run build
+RUN bun run build
 
 COPY ./analytics* ./
 RUN ./analytics.sh

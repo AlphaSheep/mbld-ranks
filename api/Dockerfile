@@ -1,11 +1,26 @@
-FROM python:3.11
+# Stage 1: Build
+FROM python:3.14-slim AS builder
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
 
-WORKDIR /code
+WORKDIR /app
 
-COPY ./requirements.txt /code/requirements.txt
+COPY pyproject.toml uv.lock ./
+ENV UV_LINK_MODE=copy
+RUN uv sync --locked --no-dev --no-install-project --no-editable
 
-RUN pip install --no-cache-dir --upgrade -r /code/requirements.txt
+COPY . .
+RUN uv sync --locked --no-dev
 
-COPY ./*.py /code/
+# Stage 2: Runtime
+FROM python:3.14-slim
 
-CMD ["uvicorn", "api:app", "--host", "0.0.0.0", "--port", "8000"]
+WORKDIR /app
+
+COPY --from=builder /app/.venv /app/.venv
+
+COPY . .
+
+ENV VIRTUAL_ENV=/app/.venv
+ENV PATH="/app/.venv/bin:$PATH"
+
+CMD ["python", "-m", "uvicorn", "api:app", "--host", "0.0.0.0", "--port", "8000"]
