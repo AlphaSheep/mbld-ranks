@@ -20,7 +20,7 @@ interface RankingsContextProps {
 export const RankingsContext = createContext<RankingsContextProps | undefined>(undefined);
 
 
-export default function RankingsProvider({ children }) {
+export default function RankingsProvider({ children }: { children: React.ReactNode }) {
   const [query, setQuery] = useSearchParams();
 
   const [rankings, setRankings] = useState<Ranking[]>([]);

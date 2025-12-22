@@ -10,10 +10,7 @@ export type Alert = {
 class AlertService {
 
   private _alerts: Alert[] = [];
-  private _setAlerts: (alerts: Alert[]) => void;
-
-  constructor() {
-  }
+  private _setAlerts: (alerts: Alert[]) => void = () => { };
 
   public registerSetAlerts(alerts: Alert[], setAlerts: (alerts: Alert[]) => void) {
     this._alerts = alerts;

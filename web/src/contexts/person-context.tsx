@@ -26,7 +26,7 @@ interface PersonContextProps {
 export const PersonContext = createContext<PersonContextProps | undefined>(undefined);
 
 
-export default function PersonProvider({ children }) {
+export default function PersonProvider({ children }: { children: React.ReactNode }) {
   const [query, setQuery] = useSearchParams();
 
   const [person, setPerson] = useState<Person | undefined>(undefined);

@@ -68,35 +68,39 @@ Change these as appropriate for your setup.
 
 ### Running Locally
 
-1. It's recommended to create seperate virtual environments for the ETL and API. In the `etl` directory, run
+1. It's recommended to create seperate virtual environments for the ETL. In the `etl` directory, run
    ```
    python -m venv .venv
    .venv/bin/activate
    pip install -r requirements.txt
    ```
-   Repeat this for the `api` directory.
 
 2. Run the ETL script to create the local DuckDB database. In the `etl` directory with the virtual environment activated, run
    ```
    python etl.py
    ```
 
+3. The API uses [`uv`](https://docs.astral.sh/uv/) for package management. To set up a virtual environment and install dependencies, from the `api` directory run
+   ```
+   uv sync
+   ```
+
 4. Run the API. From the `api` directory with the API virtual environment activated, run
    ```
-   uvicorn api.main:app --reload
+   uv run uvicorn api:app --host 0.0.0.0 --port 8000 --reload
    ```
    This will start the API on port 8000. You can access the documentation at http://localhost:8000/docs.
 
-7. Run the React website. From the `web` directory, run
+5. Run the React website. From the `web` directory, run
    ```
-   npm install
-   npm run dev
+   bun install
+   bun start
    ```
    This will start a development server on port 1234.
 
 ### Running in Docker
 
-You can run the entire project in Docker by running the following command from the root directory:
+After ensuring that you have created the necessary `.env` files as described above, you can run the entire project in Docker by running the following command from the root directory:
 ```
 docker compose up --build --detach
 ```

@@ -1,6 +1,6 @@
 import React from "react";
 
-import Equation from "jsx:../assets/equation.svg";
+import Equation from "../assets/equation";
 
 import "./about.less";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";

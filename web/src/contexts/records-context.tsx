@@ -19,7 +19,7 @@ export const RecordsContext = createContext<RecordsContextProps | undefined>(
   undefined
 );
 
-export default function RecordsProvider({ children }) {
+export default function RecordsProvider({ children }: { children: React.ReactNode }) {
   const [query, setQuery] = useSearchParams();
 
   const [records, setRecords] = useState<Result[]>([]);

@@ -7,12 +7,30 @@ footer {
   background-color: @header-background-color;
   display: flex;
   flex-direction: row;
-  justify-content: end;
+  justify-content: space-between;
   align-items: center;
   padding: 0.8em 1em;
   box-shadow: 0 -2px 4px @header-border-color;
   border-top: 1px solid @header-border-color;
   font-size: small;
+
+  @media screen and (max-width: 900px) {
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+  }
+
+  div {
+    display: flex;
+    flex-direction: row;
+    align-items: end;
+
+    @media screen and (max-width: 580px) {
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+  }
 
   span {
     margin-right: 0.2em;

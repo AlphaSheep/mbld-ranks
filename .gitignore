@@ -3,7 +3,14 @@
 *.env
 
 api/__pycache__/
+api/.venv/
 
 web/.parcel-cache/
 web/dist/
 web/node_modules/
+web/analytics-tag.txt
+
+.directory
+
+data/
+wca-metadata/

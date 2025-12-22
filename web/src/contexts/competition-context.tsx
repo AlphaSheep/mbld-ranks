@@ -19,7 +19,7 @@ interface CompetitionContextProps {
 export const CompetitionContext = createContext<CompetitionContextProps | undefined>(undefined);
 
 
-export default function CompetitionProvider({ children }) {
+export default function CompetitionProvider({ children }: { children: React.ReactNode }) {
   const [query, setQuery] = useSearchParams();
 
   const [competition, setCompetition] = useState<Competition | undefined>(undefined);
@@ -27,7 +27,7 @@ export default function CompetitionProvider({ children }) {
   const [loadingCompetition, setLoadingCompetition] = useState<boolean>(false);
   const [loadingResults, setLoadingResults] = useState<boolean>(false);
 
-  const getCompetition = async (id) => {
+  const getCompetition = async (id: string) => {
     setLoadingCompetition(true);
     try {
       const competition = await resultsService.getCompetition(id);
@@ -40,7 +40,7 @@ export default function CompetitionProvider({ children }) {
     }
   };
 
-  const getResults = async (id) => {
+  const getResults = async (id: string) => {
     setLoadingResults(true);
     try {
       const results = await resultsService.getResultsForCompetition(id);

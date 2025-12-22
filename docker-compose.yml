@@ -32,6 +32,7 @@ services:
   wca-open-db:
     image: ghcr.io/alphasheep/wca-open-db:latest
     container_name: wca-open-db
+    restart: always
     env_file: .env
     environment:
       - IMPORT_WCA_DB_ON_STARTUP=true  # Optional: import latest WCA DB on startup

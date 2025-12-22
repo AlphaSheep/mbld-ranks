@@ -186,7 +186,7 @@ class ResultsService {
       this._cacheCompetitionDetails(newComps);
     }
 
-    const result = {};
+    const result: CompetitionDict = {};
     ids.forEach((id) => (result[id] = this._competitionDetails[id]));
     return result;
   }
@@ -289,8 +289,8 @@ class ResultsService {
   private async _sortRankingsByRank(rankings: Ranking[], region: string) {
     const continents = this.getContinentIds();
 
-    let rankColumn = "worldRank";
-    let wcaRankColumn = "wcaWorldRank";
+    let rankColumn: keyof Ranking = "worldRank";
+    let wcaRankColumn: keyof Ranking = "wcaWorldRank";
     if (region === "world") {
       rankColumn = "worldRank";
       wcaRankColumn = "wcaWorldRank";
