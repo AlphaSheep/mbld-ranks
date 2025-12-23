@@ -14,7 +14,12 @@ footer {
   border-top: 1px solid @header-border-color;
   font-size: small;
 
-  @media screen and (max-width: 900px) {
+  @media screen and (max-width: @medium-screen) {
+    position: relative;
+    bottom: auto;
+    top: 0;
+    margin-bottom: 0;
+
     flex-direction: column;
     align-items: center;
     width: 100%;
@@ -25,7 +30,7 @@ footer {
     flex-direction: row;
     align-items: end;
 
-    @media screen and (max-width: 580px) {
+    @media screen and (max-width: @x-small-screen) {
       flex-direction: column;
       align-items: center;
       text-align: center;
@@ -35,6 +40,9 @@ footer {
   span {
     margin-right: 0.2em;
     margin-left: 1.8em;
+    @media screen and (max-width: @x-small-screen) {
+      margin-top: 0.8em;
+    }
   }
 
   a {
