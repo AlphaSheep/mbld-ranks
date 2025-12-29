@@ -4,18 +4,18 @@ from datetime import date, datetime
 
 @dataclass
 class BaseResult:
-    competitionId: str
-    personName: str
-    personId: str
-    personCountryId: str
-    wcaRecord: str
+    competition_id: str
+    person_name: str
+    person_id: str
+    person_country_id: str
+    wca_record: str
     best_score: float
     mean_score: float
     best_result: int
-    continentId: str
+    continent_id: str
     startdate: date
-    regionalRecord: str
-    regionalMeanRecord: str
+    regional_record: str
+    regional_mean_record: str
     value1: int
     value2: int
     value3: int
@@ -26,18 +26,18 @@ class BaseResult:
 
 @dataclass
 class Ranking(BaseResult):
-    worldRank: int | None = None
-    continentRank: int | None = None
-    countryRank: int | None = None
-    wcaWorldRank: int | None = None
-    wcaContinentRank: int | None = None
-    wcaCountryRank: int | None = None
+    world_rank: int | None = None
+    continent_rank: int | None = None
+    country_rank: int | None = None
+    wca_world_rank: int | None = None
+    wca_continent_rank: int | None = None
+    wca_country_rank: int | None = None
 
 
 @dataclass
 class Result(BaseResult):
-    roundTypeId: str
-    wcaPos: int
+    round_type_id: str
+    wca_pos: int
     pos: int
 
 
@@ -45,7 +45,7 @@ class Result(BaseResult):
 class RoundType:
     id: str
     name: str
-    cellName: str
+    cell_name: str
     rank: int
     final: int
 
@@ -54,16 +54,16 @@ class RoundType:
 class Competition:
     id: str
     name: str
-    countryId: str
+    country_id: str
     startdate: date
 
 
 @dataclass
 class Person:
-    id: str
-    subId: int
+    wca_id: str
+    sub_id: int
     name: str
-    countryId: str
+    country_id: str
     gender: str
 
 
@@ -71,16 +71,16 @@ class Person:
 class Country:
     id: str
     name: str
-    continentId: str
+    continent_id: str
     iso2: str
-    hasResults: bool
+    has_results: bool
 
 
 @dataclass
 class Continent:
     id: str
     name: str
-    recordName: str
+    record_name: str
 
 
 @dataclass

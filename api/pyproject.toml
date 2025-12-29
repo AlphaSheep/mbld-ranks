@@ -1,12 +1,22 @@
 [project]
 name = "api"
-version = "0.1.0"
 description = "Add your description here"
-readme = "README.md"
 requires-python = ">=3.12"
+dynamic = ["version"]
 dependencies = [
     "duckdb==1.4.2",
     "fastapi==0.124.4",
     "slowapi==0.1.9",
     "uvicorn==0.27.0.post1",
 ]
+
+[build-system]
+requires = ["hatchling", "hatch-vcs"]
+build-backend = "hatchling.build"
+
+[tool.hatch.version]
+source = "vcs"
+
+[tool.hatch.version.raw-options]
+search_parent_directories = true
+root = ".."
