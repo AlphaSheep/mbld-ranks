@@ -13,67 +13,97 @@ _logger = logging.getLogger(__name__)
 
 _RESULTS_IMPORT_QUERY = """
     SELECT
-        competitionId,
-        roundTypeId,
-        personName,
-        personId,
-        personCountryId,
-        value1,
-        value2,
-        value3,
-        regionalSingleRecord as wcaRecord,
-        pos as wcaPos
-    FROM Results
-    WHERE eventId = '333mbf'
+        id as result_id,
+        competition_id,
+        round_type_id,
+        person_name,
+        person_id,
+        person_country_id,
+        regional_single_record as wca_record,
+        pos as wca_pos
+    FROM wca.results
+    WHERE event_id = '333mbf'
+"""
+
+_ATTEMPTS_IMPORT_QUERY = """
+    SELECT
+        result_id,
+        attempt_number,
+        value
+    FROM wca.result_attempts
+    LEFT JOIN wca.results ON wca.result_attempts.result_id = wca.results.id
+    WHERE wca.results.event_id = '333mbf'
 """
 
 _COUNTRIES_IMPORT_QUERY = """
     SELECT
         id,
         name,
-        continentId,
+        continent_id,
         iso2
-    FROM Countries
+    FROM wca.countries
 """
 
 _CONTINENTS_IMPORT_QUERY = """
     SELECT
         id,
         name,
-        recordName
-    FROM Continents
-    WHERE recordName != ''
+        record_name
+    FROM wca.continents
+    WHERE record_name != ''
 """
 
 _COMPETITIONS_IMPORT_QUERY = """
     SELECT
         id,
         name,
-        countryId,
-        DATE(CONCAT(year, '-', LPAD(month, 2, '0'), '-', LPAD(day, 2, '0'))) AS startdate
-    FROM Competitions
+        country_id,
+        MAKE_DATE(year, month, day) AS startdate
+    FROM wca.competitions
     WHERE cancelled = 0
 """
 
 _PERSONS_IMPORT_QUERY = """
     SELECT
-        id,
-        subId,
+        wca_id,
+        sub_id,
         name,
-        countryId,
+        country_id,
         gender
-    FROM Persons
+    FROM wca.persons
 """
 
 _ROUND_TYPES_IMPORT_QUERY = """
     SELECT
         id,
         name,
-        cellName,
-        `rank`,
+        cell_name,
+        "rank",
         final
-    FROM RoundTypes
+    FROM wca.round_types
 """
+
+
+_GET_WCA_SINGLE_RANKS_QUERY = """
+    SELECT
+        person_id,
+        ranks_single.world_rank as wca_world_rank,
+        ranks_single.continent_rank as wca_continent_rank,
+        ranks_single.country_rank as wca_country_rank
+    FROM wca.ranks_single
+    WHERE event_id = '333mbf'
+"""
+
+_JOIN_WCA_RANKS_QUERY = """
+    SELECT
+        rankings.*,
+        wca_world_rank,
+        wca_continent_rank,
+        wca_country_rank
+    FROM rankings
+    LEFT JOIN wca_ranks ON rankings.person_id = wca_ranks.person_id
+"""
+
 
 _GET_BEST_RESULT_QUERY = """
     SELECT
@@ -83,35 +113,11 @@ _GET_BEST_RESULT_QUERY = """
             WHEN score2 = GREATEST(score1, score2, score3) THEN value2
             ELSE value3
         END AS best_result
-    FROM Results
-"""
-
-_UPDATE_TIMESTAMP_QUERY = """
-    SELECT updated_at FROM ar_internal_metadata WHERE value='production';
-"""
-
-_GET_WCA_SINGLE_RANKS_QUERY = """
-    SELECT
-        personId,
-        RanksSingle.worldRank as wcaWorldRank,
-        RanksSingle.continentRank as wcaContinentRank,
-        RanksSingle.countryRank as wcaCountryRank
-    FROM RanksSingle
-    WHERE eventId = '333mbf'
-"""
-
-_JOIN_WCA_RANKS_QUERY = """
-    SELECT
-        rankings.*,
-        wcaWorldRank,
-        wcaContinentRank,
-        wcaCountryRank
-    FROM rankings
-    LEFT JOIN wca_ranks ON rankings.personId = wca_ranks.personId
+    FROM results
 """
 
 
-def _fetch_data_from_mysql(query: str) -> pd.DataFrame:
+def _create_indices() -> None:
     with mysql.connect(
         host=os.getenv("WCA_MYSQL_HOST"),
         port=os.getenv("WCA_MYSQL_PORT"),
@@ -119,7 +125,16 @@ def _fetch_data_from_mysql(query: str) -> pd.DataFrame:
         user=os.environ["WCA_MYSQL_USER"],
         password=os.environ["WCA_MYSQL_PASSWORD"],
     ) as conn:
-        return pd.read_sql(query, conn)  # type: ignore # expecting _SQLConnection, get MySQLConnectionAbstract
+        with conn.cursor() as cursor:
+            for sql in [
+                "ALTER TABLE results ADD INDEX idx_results_event_id (event_id), ALGORITHM=INPLACE, LOCK=NONE",
+                "ALTER TABLE result_attempts ADD INDEX idx_attempts_result_id (result_id), ALGORITHM=INPLACE, LOCK=NONE",
+            ]:
+                try:
+                    cursor.execute(sql)
+                except mysql.errors.ProgrammingError:
+                    # Index already exists
+                    pass
 
 
 @cache
@@ -137,6 +152,45 @@ def _write_data_to_duckdb(data: pd.DataFrame, table_name: str) -> None:
         conn.execute(f"DROP TABLE IF EXISTS {table_name}")
         conn.register("data", data)
         conn.execute(f"CREATE TABLE {table_name} AS SELECT * FROM data")
+
+
+def _write_from_wca_into_duckdb(table_name: str, query: str) -> None:
+    """Write data directly from MySQL to DuckDB using DuckDB's MySQL extension."""
+    duckdb_file = _get_duckdb_file()
+    with duckdb.connect(duckdb_file) as conn:
+        _attach_mysql_to_duckdb(conn)
+
+        # Drop existing table and create new one from query
+        conn.execute(f"DROP TABLE IF EXISTS {table_name}")
+        conn.execute(f"CREATE TABLE {table_name} AS {query}")
+
+        # Detach from MySQL
+        conn.execute("DETACH wca")
+
+
+def _attach_mysql_to_duckdb(conn: duckdb.DuckDBPyConnection) -> None:
+    """Attach to MySQL database using DuckDB's MySQL extension."""
+    # Build PostgreSQL-style connection string from environment variables
+    host = os.getenv("WCA_MYSQL_HOST")
+    port = os.getenv("WCA_MYSQL_PORT")
+    database = os.getenv("WCA_MYSQL_DATABASE")
+    user = os.environ["WCA_MYSQL_USER"]
+    password = os.environ["WCA_MYSQL_PASSWORD"]
+
+    connection_string = f"host={host} user={user} password={password} port={port} database={database}"
+
+    # Install and load the MySQL extension
+    conn.execute("INSTALL mysql")
+    conn.execute("LOAD mysql")
+
+    # Attach to MySQL database
+    conn.execute(f"ATTACH '{connection_string}' AS wca (TYPE mysql, READ_ONLY)")
+
+
+def _select_from_duckdb(table_name: str) -> pd.DataFrame:
+    duckdb_file = _get_duckdb_file()
+    with duckdb.connect(duckdb_file) as conn:
+        return conn.execute(f"SELECT * FROM {table_name}").fetchdf()
 
 
 def _multi_result_to_components(result: int) -> tuple[int, int, int]:
@@ -166,46 +220,42 @@ def _multi_result_to_score(result: int) -> float | None:
     return solved * accuracy / math.sqrt(time_used)
 
 
-def _enhance_results(
-    results: pd.DataFrame, countries: pd.DataFrame, competitions: pd.DataFrame
-) -> pd.DataFrame:
+def _merge_attempts(results: pd.DataFrame, attempts: pd.DataFrame) -> pd.DataFrame:
+    for attempt_number in range(1, 4):
+        col_name = f"value{attempt_number}"
+        values = attempts[attempts["attempt_number"] == attempt_number][["result_id", "value"]].rename(
+            columns={"value": col_name}
+        )
+        results = results.merge(values, how="left", on="result_id")
+        results[col_name] = results[col_name].fillna(0).astype(int)
+
+    return results
+
+
+def _enhance_results(results: pd.DataFrame, countries: pd.DataFrame, competitions: pd.DataFrame) -> pd.DataFrame:
     results["score1"] = results["value1"].apply(_multi_result_to_score)
     results["score2"] = results["value2"].apply(_multi_result_to_score)
     results["score3"] = results["value3"].apply(_multi_result_to_score)
     results.reset_index(drop=True, inplace=True)
 
     duckdb.register("results", results)
-    results[["best_score", "best_result"]] = duckdb.sql(
-        _GET_BEST_RESULT_QUERY
-    ).fetchall()
+    results[["best_score", "best_result"]] = duckdb.sql(_GET_BEST_RESULT_QUERY).fetchall()
 
     results["best_result"] = results["best_result"].astype(int)
     results = _calculate_mean_score(results)
 
-    results = results.join(
-        countries[["id", "continentId"]].set_index("id"), on="personCountryId"
-    )
-    results = results.join(
-        competitions[["id", "startdate"]].set_index("id"), on="competitionId"
-    )
+    results = results.join(countries[["id", "continent_id"]].set_index("id"), on="person_country_id")
+    results = results.join(competitions[["id", "startdate"]].set_index("id"), on="competition_id")
 
     return results
 
 
 def _calculate_mean_score(results: pd.DataFrame) -> pd.DataFrame:
-    has_three_solves = (
-        (results["value1"] != 0) & (results["value2"] != 0) & (results["value3"] != 0)
-    )
-    has_dnf = (
-        (results["score1"] < 0) | (results["score2"] < 0) | (results["score3"] < 0)
-    )
-    has_three_valid_results = (
-        (results["score1"] > 0) & (results["score2"] > 0) & (results["score3"] > 0)
-    )
+    has_three_solves = (results["value1"] != 0) & (results["value2"] != 0) & (results["value3"] != 0)
+    has_dnf = (results["score1"] < 0) | (results["score2"] < 0) | (results["score3"] < 0)
+    has_three_valid_results = (results["score1"] > 0) & (results["score2"] > 0) & (results["score3"] > 0)
 
-    results.loc[has_three_valid_results, "mean_score"] = (
-        results["score1"] + results["score2"] + results["score3"]
-    ) / 3
+    results.loc[has_three_valid_results, "mean_score"] = (results["score1"] + results["score2"] + results["score3"]) / 3
 
     results.loc[has_three_solves & has_dnf, "mean_score"] = -1
 
@@ -216,23 +266,20 @@ def _get_rankings(results: pd.DataFrame, wca_ranks: pd.DataFrame) -> pd.DataFram
     return _get_rankings_by_field(results, wca_ranks, "best_score")
 
 
-def _get_mean_score_rankings(
-    results: pd.DataFrame, wca_ranks: pd.DataFrame
-) -> pd.DataFrame:
+def _get_mean_score_rankings(results: pd.DataFrame, wca_ranks: pd.DataFrame) -> pd.DataFrame:
     return _get_rankings_by_field(results, wca_ranks, "mean_score")
 
 
-def _get_rankings_by_field(
-    results: pd.DataFrame, wca_ranks: pd.DataFrame, rank_field: str
-) -> pd.DataFrame:
+def _get_rankings_by_field(results: pd.DataFrame, wca_ranks: pd.DataFrame, rank_field: str) -> pd.DataFrame:
     # Get best result for each person
-    best_index = results.groupby("personId")[rank_field].idxmax()
-    rankings = results.loc[best_index]
+    best_index = results.groupby("person_id")[rank_field].idxmax()
+    rankings = results.loc[best_index[best_index.notna()]].copy()
+
     rankings.drop(
         columns=[
-            "roundTypeId",
+            "round_type_id",
             "pos",
-            "wcaPos",
+            "wca_pos",
         ],
         inplace=True,
     )
@@ -240,71 +287,52 @@ def _get_rankings_by_field(
     rankings.sort_values(by=rank_field, ascending=False, inplace=True)
 
     # World ranking
-    rankings["worldRank"] = (
-        rankings[rank_field].rank(method="min", ascending=False).astype("Int64")
+    rankings["world_rank"] = rankings[rank_field].rank(method="min", ascending=False).astype("Int64")
+    rankings["continent_rank"] = (
+        rankings.groupby("continent_id")[rank_field].rank(method="min", ascending=False).astype("Int64")
     )
-    rankings["continentRank"] = (
-        rankings.groupby("continentId")[rank_field]
-        .rank(method="min", ascending=False)
-        .astype("Int64")
-    )
-    rankings["countryRank"] = (
-        rankings.groupby("personCountryId")[rank_field]
-        .rank(method="min", ascending=False)
-        .astype("Int64")
+    rankings["country_rank"] = (
+        rankings.groupby("person_country_id")[rank_field].rank(method="min", ascending=False).astype("Int64")
     )
 
     # Remove ranking for competitors with no results
     is_missing = rankings[rank_field] <= 0
-    rankings.loc[is_missing, "worldRank"] = None
-    rankings.loc[is_missing, "continentRank"] = None
-    rankings.loc[is_missing, "countryRank"] = None
+    rankings.loc[is_missing, "world_rank"] = None
+    rankings.loc[is_missing, "continent_rank"] = None
+    rankings.loc[is_missing, "country_rank"] = None
 
     # WCA ranking
     duckdb.register("rankings", rankings)
     duckdb.register("wca_ranks", wca_ranks)
     rankings = duckdb.sql(_JOIN_WCA_RANKS_QUERY).fetchdf()
-    rankings["wcaWorldRank"] = rankings["wcaWorldRank"].astype("Int64")
-    rankings["wcaContinentRank"] = rankings["wcaContinentRank"].astype("Int64")
-    rankings["wcaCountryRank"] = rankings["wcaCountryRank"].astype("Int64")
-    rankings["worldRank"] = rankings["worldRank"].astype("Int64")
-    rankings["continentRank"] = rankings["continentRank"].astype("Int64")
-    rankings["countryRank"] = rankings["countryRank"].astype("Int64")
+    rankings["wca_world_rank"] = rankings["wca_world_rank"].astype("Int64")
+    rankings["wca_continent_rank"] = rankings["wca_continent_rank"].astype("Int64")
+    rankings["wca_country_rank"] = rankings["wca_country_rank"].astype("Int64")
+    rankings["world_rank"] = rankings["world_rank"].astype("Int64")
+    rankings["continent_rank"] = rankings["continent_rank"].astype("Int64")
+    rankings["country_rank"] = rankings["country_rank"].astype("Int64")
 
     return rankings
 
 
 def _mark_wca_prs(results: pd.DataFrame) -> pd.DataFrame:
-    results.sort_values(
-        by=["startdate", "best_result"], inplace=True, ascending=[True, True]
-    )
+    results.sort_values(by=["startdate", "best_result"], inplace=True, ascending=[True, True])
     results["temp_best_result"] = results["best_result"].copy()
     results.loc[results["temp_best_result"] <= 0, "temp_best_result"] = None
-    wca_personal_records = (
-        results["best_result"]
-        == results.groupby("personId")["temp_best_result"].cummin()
-    )
-    not_wca_records = results["wcaRecord"].isna() & (results["best_result"] > 0)
-    results.loc[wca_personal_records & not_wca_records, "wcaRecord"] = "PR"
+    wca_personal_records = results["best_result"] == results.groupby("person_id")["temp_best_result"].cummin()
+    not_wca_records = results["wca_record"].isna() & (results["best_result"] > 0)
+    results.loc[wca_personal_records & not_wca_records, "wca_record"] = "PR"
     results.drop(columns=["temp_best_result"], inplace=True)
 
     return results
 
 
-def _mark_regional_single_records(
-    results: pd.DataFrame, continents: pd.DataFrame
-) -> pd.DataFrame:
-    return _mark_regional_records(
-        results, continents, "best_score", "regionalRecord"
-    )
+def _mark_regional_single_records(results: pd.DataFrame, continents: pd.DataFrame) -> pd.DataFrame:
+    return _mark_regional_records(results, continents, "best_score", "regional_record")
 
 
-def _mark_regional_mean_records(
-    results: pd.DataFrame, continents: pd.DataFrame
-) -> pd.DataFrame:
-    return _mark_regional_records(
-        results, continents, "mean_score", "regionalMeanRecord"
-    )
+def _mark_regional_mean_records(results: pd.DataFrame, continents: pd.DataFrame) -> pd.DataFrame:
+    return _mark_regional_records(results, continents, "mean_score", "regional_mean_record")
 
 
 def _mark_regional_records(
@@ -313,22 +341,13 @@ def _mark_regional_records(
     score_column: str,
     record_column: str,
 ) -> pd.DataFrame:
-    results.sort_values(
-        by=["startdate", score_column], inplace=True, ascending=[True, False]
-    )
+    results.sort_values(by=["startdate", score_column], inplace=True, ascending=[True, False])
     valid_results = results[score_column] > 0
 
     world_records = results[score_column] == results[score_column].cummax()
-    continent_records = (
-        results[score_column] == results.groupby("continentId")[score_column].cummax()
-    )
-    country_records = (
-        results[score_column]
-        == results.groupby("personCountryId")[score_column].cummax()
-    )
-    personal_records = (
-        results[score_column] == results.groupby("personId")[score_column].cummax()
-    )
+    continent_records = results[score_column] == results.groupby("continent_id")[score_column].cummax()
+    country_records = results[score_column] == results.groupby("person_country_id")[score_column].cummax()
+    personal_records = results[score_column] == results.groupby("person_id")[score_column].cummax()
 
     results[record_column] = None
     results.loc[personal_records & valid_results, record_column] = "PR"
@@ -345,26 +364,22 @@ def _mark_regional_records(
 
 def _convert_CR_to_record_name(result: pd.Series, continents: pd.DataFrame, record_column: str) -> str:
     if result[record_column] == "CR":
-        return continents.recordName[continents.id == result.continentId].values[0]
+        return continents.record_name[continents.id == result.continent_id].values[0]
     return result[record_column]
 
 
 def _add_competitor_rankings(results: pd.DataFrame) -> pd.DataFrame:
     results["pos"] = (
-        results.groupby(["competitionId", "roundTypeId"])["best_score"]
+        results.groupby(["competition_id", "round_type_id"])["best_score"]
         .rank(method="min", ascending=False)
         .astype(int)
     )
     return results
 
 
-def _add_has_results_for_country(
-    countries: pd.DataFrame, results: pd.DataFrame
-) -> pd.DataFrame:
-    countriesWithResults = set(results.personCountryId)
-    countries["hasResults"] = countries.apply(
-        lambda country: country.id in countriesWithResults, axis=1
-    )
+def _add_has_results_for_country(countries: pd.DataFrame, results: pd.DataFrame) -> pd.DataFrame:
+    countries_with_results = set(results.person_country_id)
+    countries["has_results"] = countries.apply(lambda country: country.id in countries_with_results, axis=1)
     return countries
 
 
@@ -379,54 +394,59 @@ def _load_metadata_into_duckdb():
     with duckdb.connect(duckdb_file) as conn:
         _logger.info("Loading metadata from %s into DuckDB", metadata_file)
         conn.execute("DROP TABLE IF EXISTS metadata")
-        conn.execute(
-            f"CREATE TABLE metadata AS SELECT * FROM read_json_auto('{metadata_file}')"
-        )
+        conn.execute(f"CREATE TABLE metadata AS SELECT * FROM read_json_auto('{metadata_file}')")
 
 
 def load_from_mysql_to_duckdb():
+    _logger.info("Creating indices in WCA DB")
+    _create_indices()
+    _logger.info("Created indices in WCA DB")
+
     _logger.info("Starting load_from_mysql_to_duckdb")
 
-    _logger.info("Fetching countries from WCA MySQL")
-    countries = _fetch_data_from_mysql(_COUNTRIES_IMPORT_QUERY)
-    _logger.info("Fetched countries: %d rows", len(countries))
-    _write_data_to_duckdb(countries, "countries")
+    _logger.info("Writing countries from WCA DB into DuckDB")
+    _write_from_wca_into_duckdb("countries", _COUNTRIES_IMPORT_QUERY)
+    countries = _select_from_duckdb("countries")
     _logger.info("Wrote 'countries' to DuckDB")
 
-    _logger.info("Fetching continents from WCA MySQL")
-    continents = _fetch_data_from_mysql(_CONTINENTS_IMPORT_QUERY)
-    _logger.info("Fetched continents: %d rows", len(continents))
-    _write_data_to_duckdb(continents, "continents")
+    _logger.info("Writing continents from WCA DB into DuckDB")
+    _write_from_wca_into_duckdb("continents", _CONTINENTS_IMPORT_QUERY)
+    continents = _select_from_duckdb("continents")
     _logger.info("Wrote 'continents' to DuckDB")
 
-    _logger.info("Fetching competitions from WCA MySQL")
-    competitions = _fetch_data_from_mysql(_COMPETITIONS_IMPORT_QUERY)
-    _logger.info("Fetched competitions: %d rows", len(competitions))
-    _write_data_to_duckdb(competitions, "competitions")
+    _logger.info("Writing competitions from WCA DB into DuckDB")
+    _write_from_wca_into_duckdb("competitions", _COMPETITIONS_IMPORT_QUERY)
+    competitions = _select_from_duckdb("competitions")
     _logger.info("Wrote 'competitions' to DuckDB")
 
-    _logger.info("Fetching persons from WCA MySQL")
-    persons = _fetch_data_from_mysql(_PERSONS_IMPORT_QUERY)
-    _logger.info("Fetched persons: %d rows", len(persons))
-    _write_data_to_duckdb(persons, "persons")
+    _logger.info("Writing persons from WCA DB into DuckDB")
+    _write_from_wca_into_duckdb("persons", _PERSONS_IMPORT_QUERY)
     _logger.info("Wrote 'persons' to DuckDB")
 
-    _logger.info("Fetching round types from WCA MySQL")
-    round_types = _fetch_data_from_mysql(_ROUND_TYPES_IMPORT_QUERY)
-    _logger.info("Fetched round types: %d rows", len(round_types))
-    _write_data_to_duckdb(round_types, "round_types")
+    _logger.info("Writing round types from WCA DB into DuckDB")
+    _write_from_wca_into_duckdb("round_types", _ROUND_TYPES_IMPORT_QUERY)
     _logger.info("Wrote 'round_types' to DuckDB")
 
-    _logger.info("Fetching WCA single ranks from WCA MySQL")
-    wca_ranks = _fetch_data_from_mysql(_GET_WCA_SINGLE_RANKS_QUERY)
-    _logger.info("Fetched WCA ranks: %d rows", len(wca_ranks))
-    _write_data_to_duckdb(wca_ranks, "wca_ranks")
+    _logger.info("Writing WCA single ranks from WCA DB into DuckDB")
+    _write_from_wca_into_duckdb("wca_ranks", _GET_WCA_SINGLE_RANKS_QUERY)
+    wca_ranks = _select_from_duckdb("wca_ranks")
     _logger.info("Wrote 'wca_ranks' to DuckDB")
 
-    _logger.info("Fetching results from WCA MySQL")
-    results = _fetch_data_from_mysql(_RESULTS_IMPORT_QUERY)
-    _logger.info("Fetched results: %d rows", len(results))
+    _logger.info("Writing results from WCA DB into DuckDB")
+    _write_from_wca_into_duckdb("results_raw", _RESULTS_IMPORT_QUERY)
+    _logger.info("Wrote 'results_raw' to DuckDB")
 
+    _logger.info("Writing attempts from WCA DB into DuckDB")
+    _write_from_wca_into_duckdb("attempts", _ATTEMPTS_IMPORT_QUERY)
+    _logger.info("Wrote 'attempts' to DuckDB")
+
+    _logger.info("Merging results with attempts")
+    attempts = _select_from_duckdb("attempts")
+    results = _select_from_duckdb("results_raw")
+    results = _merge_attempts(results, attempts)
+    _logger.info("Merged results with attempts: %d rows", len(results))
+
+    _logger.info("Enhancing results with scores and best results")
     results = _enhance_results(results, countries, competitions)
     results = _mark_wca_prs(results)
     results = _mark_regional_single_records(results, continents)
@@ -454,4 +474,5 @@ def load_from_mysql_to_duckdb():
 
 
 if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
     load_from_mysql_to_duckdb()

@@ -1,10 +1,26 @@
-FROM python:3.11
+# Stage 1: Build
+FROM python:3.14-slim AS builder
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
 
 WORKDIR /code
 
-COPY ./requirements.txt /code/requirements.txt
-RUN pip install --no-cache-dir --upgrade -r /code/requirements.txt
+COPY pyproject.toml uv.lock ./
+ENV UV_LINK_MODE=copy
+RUN uv sync --locked --no-dev --no-install-project --no-editable
+
+COPY . .
+RUN uv sync --locked --no-dev
+
+# Stage 2: Runtime
+FROM python:3.14
+
+WORKDIR /code
+
+COPY --from=builder /code/.venv /code/.venv
 
 COPY ./*.py /code/
+
+ENV VIRTUAL_ENV=/app/.venv
+ENV PATH="/app/.venv/bin:$PATH"
 
 CMD ["python", "-m", "run"]

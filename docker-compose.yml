@@ -30,7 +30,7 @@ services:
       - mbld-ranks-network
 
   wca-open-db:
-    image: ghcr.io/alphasheep/wca-open-db:latest
+    image: ghcr.io/alphasheep/wca-open-db:2
     container_name: wca-open-db
     restart: always
     env_file: .env
