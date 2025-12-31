@@ -24,7 +24,10 @@ services:
       - mbld-ranks-network
 
   mbld-ranks-web:
-    build: ./web
+    build:
+      context: ./web
+      args:
+        API_URL: ${API_URL:-api/v2}
     restart: always
     env_file: ./web/.env
     ports:

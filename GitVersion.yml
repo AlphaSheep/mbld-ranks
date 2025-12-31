@@ -9,7 +9,6 @@ branches:
     mode: ManualDeployment
     label: '{BranchName}'
     increment: Inherit
-    is-source-branch-for: []
     is-main-branch: false
 ignore:
   sha: []

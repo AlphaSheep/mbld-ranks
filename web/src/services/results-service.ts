@@ -9,7 +9,7 @@ import alertService from "./alert-service";
 import MeanType from "../interfaces/mean-type";
 
 class ResultsService {
-  private _api: string = process.env.API_URL || "api/v0";
+  private _api: string = process.env.API_URL || "api/v2";
 
   private _countries_fetch_in_progress: Promise<Country[]> | undefined;
 
