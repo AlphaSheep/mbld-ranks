@@ -25,49 +25,49 @@ export default function PersonRanksTable({
         <tr>
           <th>Single</th>
           <th></th>
-          {personMeanRanks?.worldRank && <th>Mean</th>}
+          {personMeanRanks?.world_rank && <th>Mean</th>}
         </tr>
       </thead>
       <tbody>
         <tr>
           <td className="rank">
-            {personSingleRanks?.worldRank || "--"}
+            {personSingleRanks?.world_rank || "--"}
             <RankMovementTag
-              oldRank={personSingleRanks?.wcaWorldRank}
-              newRank={personSingleRanks?.worldRank}
+              oldRank={personSingleRanks?.wca_world_rank}
+              newRank={personSingleRanks?.world_rank}
             />
           </td>
           <td>
             <a href="/rankings?region=world">World</a> rank
           </td>
-          {personMeanRanks?.worldRank && (
-            <td className="rank">{personMeanRanks?.worldRank || "--"}</td>
+          {personMeanRanks?.world_rank && (
+            <td className="rank">{personMeanRanks?.world_rank || "--"}</td>
           )}
         </tr>
         <tr>
           <td className="rank">
-            {personSingleRanks?.continentRank || "--"}
+            {personSingleRanks?.continent_rank || "--"}
             <RankMovementTag
-              oldRank={personSingleRanks?.wcaContinentRank}
-              newRank={personSingleRanks?.continentRank}
+              oldRank={personSingleRanks?.wca_continent_rank}
+              newRank={personSingleRanks?.continent_rank}
             />
           </td>
           <td>
-            <a href={`/rankings?region=${personCountry?.continentId}`}>
+            <a href={`/rankings?region=${personCountry?.continent_id}`}>
               {personContinent}
             </a>{" "}
             rank
           </td>
-          {personMeanRanks?.worldRank && (
-            <td className="rank">{personMeanRanks?.continentRank || "--"}</td>
+          {personMeanRanks?.world_rank && (
+            <td className="rank">{personMeanRanks?.continent_rank || "--"}</td>
           )}
         </tr>
         <tr>
           <td className="rank">
-            {personSingleRanks?.countryRank || "--"}
+            {personSingleRanks?.country_rank || "--"}
             <RankMovementTag
-              oldRank={personSingleRanks?.wcaCountryRank}
-              newRank={personSingleRanks?.countryRank}
+              oldRank={personSingleRanks?.wca_country_rank}
+              newRank={personSingleRanks?.country_rank}
             />
           </td>
           <td>
@@ -76,8 +76,8 @@ export default function PersonRanksTable({
             </a>{" "}
             rank
           </td>
-          {personMeanRanks?.worldRank && (
-            <td className="rank">{personMeanRanks?.countryRank || "--"}</td>
+          {personMeanRanks?.world_rank && (
+            <td className="rank">{personMeanRanks?.country_rank || "--"}</td>
           )}
         </tr>
       </tbody>

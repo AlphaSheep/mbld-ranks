@@ -1,10 +1,10 @@
 export default interface Ranking {
-  competitionId: string;
-  personName: string;
-  personId: string;
-  personCountryId: string;
-  wcaRecord: string;
-  wcaPos: number;
+  competition_id: string;
+  person_name: string;
+  person_id: string;
+  person_country_id: string;
+  wca_record: string;
+  wca_pos: number;
   best_score: number;
   best_result: number;
   mean_score: number | undefined;
@@ -14,17 +14,17 @@ export default interface Ranking {
   score1: number | undefined;
   score2: number | undefined;
   score3: number | undefined;
-  continentId: string;
+  continent_id: string;
   startdate: Date;
-  regionalRecord: string;
-  regionalMeanRecord: string;
+  regional_record: string;
+  regional_mean_record: string;
   pos: number;
-  worldRank: number;
-  continentRank: number;
-  countryRank: number;
-  wcaWorldRank: number;
-  wcaContinentRank: number;
-  wcaCountryRank: number;
+  world_rank: number;
+  continent_rank: number;
+  country_rank: number;
+  wca_world_rank: number;
+  wca_continent_rank: number;
+  wca_country_rank: number;
   rank?: number;
-  wcaRank?: number;
+  wca_rank?: number;
 }

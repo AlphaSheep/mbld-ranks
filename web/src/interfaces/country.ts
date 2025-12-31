@@ -1,7 +1,7 @@
 export default interface Country {
   id: string;
   name: string;
-  continentId: string;
+  continent_id: string;
   iso2: string;
-  hasResults?: boolean;
+  has_results?: boolean;
 }

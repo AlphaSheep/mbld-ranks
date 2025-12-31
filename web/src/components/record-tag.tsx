@@ -5,14 +5,14 @@ import Ranking from "../interfaces/ranking";
 import "./record-tag.less";
 
 export default function RecordTag({ result }: { result: Result | Ranking }) {
-  const oldRecord = result.wcaRecord;
-  const newRecord = result.regionalRecord;
+  const oldRecord = result.wca_record;
+  const newRecord = result.regional_record;
   return <RecordTagDifference oldRecord={oldRecord} newRecord={newRecord} />;
 }
 
 export function RecordTagForMean({ result }: { result: Result | Ranking }) {
   const oldRecord = "";
-  const newRecord = result.regionalMeanRecord;
+  const newRecord = result.regional_meanRecord;
   return <RecordTagDifference oldRecord={oldRecord} newRecord={newRecord} />;
 }
 

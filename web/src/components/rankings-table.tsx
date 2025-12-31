@@ -32,22 +32,22 @@ export default function RankingsTable({
             <tbody>
               {rankings.map((ranking) => (
                 <tr
-                  key={`${ranking.rank}-${ranking.personId}-${ranking.competitionId}`}
+                  key={`${ranking.rank}-${ranking.person_id}-${ranking.competition_id}`}
                 >
                   <td>
                     {ranking.rank}
                     {meanType === MeanType.Single ? (
                       <RankMovementTag
-                        oldRank={ranking.wcaRank}
+                        oldRank={ranking.wca_rank}
                         newRank={ranking.rank}
                       />
                     ) : null}
                   </td>
                   <td>
                     <PersonLink
-                      personId={ranking.personId}
-                      personName={ranking.personName}
-                      personCountryId={ranking.personCountryId}
+                      personId={ranking.person_id}
+                      personName={ranking.person_name}
+                      personCountryId={ranking.person_country_id}
                     />
                   </td>
                   <td>
@@ -62,7 +62,7 @@ export default function RankingsTable({
                   </td>
                   <td>
                     <CompetitionLink
-                      competition={compDetails[ranking.competitionId]}
+                      competition={compDetails[ranking.competition_id]}
                     />
                   </td>
                 </tr>

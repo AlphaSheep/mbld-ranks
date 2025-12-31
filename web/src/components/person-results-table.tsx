@@ -31,20 +31,20 @@ export default function PersonResultsTable({ results }: { results: Result[] }) {
             </thead>
             <tbody>
               {results.map((result) => (
-                <tr key={`${result.competitionId}-${result.roundTypeId}`}>
+                <tr key={`${result.competition_id}-${result.round_type_id}`}>
                   <td>
                     <CompetitionLink
                       competition={
-                        compDetails[result.competitionId] ||
-                        result.competitionId
+                        compDetails[result.competition_id] ||
+                        result.competition_id
                       }
                     />
                   </td>
-                  <td>{resultsService.getRoundName(result.roundTypeId)}</td>
+                  <td>{resultsService.getRoundName(result.round_type_id)}</td>
                   <td>
                     {result.pos}
                     <RankMovementTag
-                      oldRank={result.wcaPos}
+                      oldRank={result.wca_pos}
                       newRank={result.pos}
                     />
                   </td>

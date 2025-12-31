@@ -13,7 +13,7 @@ import FormattedMean from "./formatted-mean";
 export default function CompetitionResultsTable({ results }: { results: Result[] }) {
 
   // Find distinct round types.
-  const rounds = [...new Set(results.map(result => result.roundTypeId))];
+  const rounds = [...new Set(results.map(result => result.round_type_id))];
 
   return <>
     { (results && results.length) > 0 ?
@@ -33,14 +33,14 @@ export default function CompetitionResultsTable({ results }: { results: Result[]
                 </tr>
               </thead>
               <tbody>
-                {results.filter(result => result.roundTypeId === round)
-                  .map(result => <tr key={`${result.roundTypeId}-${result.pos}-${result.personId}`}>
+                {results.filter(result => result.round_type_id === round)
+                  .map(result => <tr key={`${result.round_type_id}-${result.pos}-${result.person_id}`}>
                   <td>
                     {result.pos}
-                    <RankMovementTag oldRank={result.wcaPos} newRank={result.pos} />
+                    <RankMovementTag oldRank={result.wca_pos} newRank={result.pos} />
                   </td>
                   <td>
-                    <PersonLink personId={result.personId} personName={result.personName} personCountryId={result.personCountryId} />
+                    <PersonLink personId={result.person_id} personName={result.person_name} personCountryId={result.person_country_id} />
                   </td>
                   <td>
                   <div className="result-best-single">

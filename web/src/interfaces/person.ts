@@ -1,7 +1,7 @@
 export default interface Person {
-  id: string;
-  subId: number;
+  wca_id: string;
+  sub_id: number;
   name: string;
-  countryId: string;
+  country_id: string;
   gender: string;
 }

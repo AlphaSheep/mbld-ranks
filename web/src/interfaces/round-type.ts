@@ -1,7 +1,7 @@
 export default interface RoundType {
   id: string;
   name: string;
-  cellName: string;
+  cell_name: string;
   rank: string;
   final: number;
 }

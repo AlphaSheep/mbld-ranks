@@ -111,7 +111,7 @@ class ResultsService {
       if (await this._checkForErrors(response)) return [];
       this._countries = await response.json();
     }
-    return this._countries.filter((country) => country.hasResults);
+    return this._countries.filter((country) => country.has_results);
   }
 
   public async getCountryIds(): Promise<string[]> {
@@ -263,8 +263,8 @@ class ResultsService {
         return -1;
       }
 
-      const aRound = roundTypes.find((rt) => rt.id === a.roundTypeId);
-      const bRound = roundTypes.find((rt) => rt.id === b.roundTypeId);
+      const aRound = roundTypes.find((rt) => rt.id === a.round_type_id);
+      const bRound = roundTypes.find((rt) => rt.id === b.round_type_id);
 
       if (!aRound || !bRound) {
         return 0;
@@ -289,22 +289,22 @@ class ResultsService {
   private async _sortRankingsByRank(rankings: Ranking[], region: string) {
     const continents = this.getContinentIds();
 
-    let rankColumn: keyof Ranking = "worldRank";
-    let wcaRankColumn: keyof Ranking = "wcaWorldRank";
+    let rankColumn: keyof Ranking = "world_rank";
+    let wcaRankColumn: keyof Ranking = "wca_world_rank";
     if (region === "world") {
-      rankColumn = "worldRank";
-      wcaRankColumn = "wcaWorldRank";
+      rankColumn = "world_rank";
+      wcaRankColumn = "wca_world_rank";
     } else if ((await continents).includes(region)) {
-      rankColumn = "continentRank";
-      wcaRankColumn = "wcaContinentRank";
+      rankColumn = "continent_rank";
+      wcaRankColumn = "wca_continent_rank";
     } else {
-      rankColumn = "countryRank";
-      wcaRankColumn = "wcaCountryRank";
+      rankColumn = "country_rank";
+      wcaRankColumn = "wca_country_rank";
     }
 
     rankings.forEach((r) => {
       r.rank = r[rankColumn];
-      r.wcaRank = r[wcaRankColumn];
+      r.wca_rank = r[wcaRankColumn];
     });
 
     rankings.sort((a, b) => {

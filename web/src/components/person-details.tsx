@@ -18,9 +18,9 @@ export default function PersonDetails({
   personSingleRanks: Ranking | undefined;
   personMeanRanks: Ranking | undefined;
 }) {
-  const personCountry = resultsService.getCountry(person?.countryId);
+  const personCountry = resultsService.getCountry(person?.country_id);
   const personContinent = resultsService.getContinentName(
-    personCountry?.continentId
+    personCountry?.continent_id
   );
 
   if (!person) {
@@ -31,10 +31,10 @@ export default function PersonDetails({
     <div className="person-details">
       <h1>{person?.name}</h1>
       <p>
-        <WcaIdLink wcaId={person?.id} />
+        <WcaIdLink wcaId={person?.wca_id} />
       </p>
       <p>
-        <CountryWithFlag countryId={person?.countryId} />
+        <CountryWithFlag countryId={person?.country_id} />
       </p>
 
       <PersonBestsTable

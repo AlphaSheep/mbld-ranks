@@ -27,7 +27,7 @@ export default function PersonBestsTable({
             <CompetitionLinkForResult result={personSingleRanks} />
           </td>
         </tr>
-        {personMeanRanks?.worldRank && (
+        {personMeanRanks?.world_rank && (
           <tr>
             <td>
               <FormattedMeanWithResults result={personMeanRanks} />

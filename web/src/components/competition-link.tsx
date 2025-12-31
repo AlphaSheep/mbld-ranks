@@ -19,5 +19,5 @@ export function CompetitionLinkForResult({ result }: { result: Result | Ranking 
   if (!result) return null;
   const compDetails = useCompetitionDetails([result] as Result[] | Ranking[]);
 
-  return <CompetitionLink competition={compDetails[result.competitionId]} />;
+  return <CompetitionLink competition={compDetails[result.competition_id]} />;
 }

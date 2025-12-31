@@ -5,4 +5,4 @@ export default interface Competition {
   startdate: Date;
 }
 
-export type CompetitionDict = { [competitionId: string] : Competition };
+export type CompetitionDict = { [competition_id: string] : Competition };

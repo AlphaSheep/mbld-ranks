@@ -1,23 +1,23 @@
 export default interface Result {
-  competitionId: string;
-  roundTypeId: string;
-  personName: string;
-  personId: string;
-  personCountryId: string;
+  competition_id: string;
+  round_type_id: string;
+  person_name: string;
+  person_id: string;
+  person_country_id: string;
   value1: number;
   value2: number;
   value3: number;
-  wcaRecord: string;
-  wcaPos: number;
+  wca_record: string;
+  wca_pos: number;
   score1: number;
   score2: number;
   score3: number;
   best_score: number;
   best_result: number;
   mean_score: number | null;
-  continentId: string;
+  continent_id: string;
   startdate: Date;
-  regionalRecord: string;
-  regionalMeanRecord: string;
+  regional_record: string;
+  regional_mean_record: string;
   pos: number;
 }

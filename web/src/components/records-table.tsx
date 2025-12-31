@@ -25,7 +25,7 @@ export default function RecordsTable( { results, meanType }: { results: Result[]
             </tr>
           </thead>
           <tbody>
-            {results.map(result => <tr key={`${result.competitionId}-${result.roundTypeId}`}>
+            {results.map(result => <tr key={`${result.competition_id}-${result.round_type_id}`}>
               <td>{formatDate(result.startdate)}</td>
               <td>
                 {
@@ -43,10 +43,10 @@ export default function RecordsTable( { results, meanType }: { results: Result[]
                 }
               </td>
               <td>
-                <PersonLink personId={result.personId} personName={result.personName} personCountryId={result.personCountryId} />
+                <PersonLink personId={result.person_id} personName={result.person_name} personCountryId={result.person_country_id} />
               </td>
               <td className="drop-if-small">
-                <CompetitionLink competition={compDetails[result.competitionId]} />
+                <CompetitionLink competition={compDetails[result.competition_id]} />
               </td>
             </tr>)}
           </tbody>
