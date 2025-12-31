@@ -12,6 +12,7 @@ _logger = logging.getLogger(__name__)
 
 
 _RESULTS_IMPORT_QUERY = """
+FROM mysql_query('wca', '
     SELECT
         id as result_id,
         competition_id,
@@ -21,78 +22,84 @@ _RESULTS_IMPORT_QUERY = """
         person_country_id,
         regional_single_record as wca_record,
         pos as wca_pos
-    FROM wca.results
-    WHERE event_id = '333mbf'
-"""
+    FROM results
+    WHERE event_id = ''333mbf''
+')"""
 
 _ATTEMPTS_IMPORT_QUERY = """
+FROM mysql_query('wca', '
     SELECT
-        result_id,
-        attempt_number,
-        value
-    FROM wca.result_attempts
-    LEFT JOIN wca.results ON wca.result_attempts.result_id = wca.results.id
-    WHERE wca.results.event_id = '333mbf'
-"""
+        result_attempts.result_id,
+        result_attempts.attempt_number,
+        result_attempts.value
+    FROM result_attempts
+    LEFT JOIN results ON result_attempts.result_id = results.id
+    WHERE results.event_id = ''333mbf''
+')"""
 
 _COUNTRIES_IMPORT_QUERY = """
+FROM mysql_query('wca', '
     SELECT
         id,
         name,
         continent_id,
         iso2
-    FROM wca.countries
-"""
+    FROM countries
+')"""
 
 _CONTINENTS_IMPORT_QUERY = """
+FROM mysql_query('wca', '
     SELECT
         id,
         name,
         record_name
-    FROM wca.continents
-    WHERE record_name != ''
-"""
+    FROM continents
+    WHERE record_name != ''''
+')"""
 
 _COMPETITIONS_IMPORT_QUERY = """
+FROM mysql_query('wca', '
     SELECT
         id,
         name,
         country_id,
-        MAKE_DATE(year, month, day) AS startdate
-    FROM wca.competitions
+        DATE(CONCAT(year, ''-'', LPAD(month, 2, ''0''), ''-'', LPAD(day, 2, ''0''))) AS startdate
+    FROM competitions
     WHERE cancelled = 0
-"""
+')"""
 
 _PERSONS_IMPORT_QUERY = """
+FROM mysql_query('wca', '
     SELECT
         wca_id,
         sub_id,
         name,
         country_id,
         gender
-    FROM wca.persons
-"""
+    FROM persons
+')"""
 
 _ROUND_TYPES_IMPORT_QUERY = """
+FROM mysql_query('wca', '
     SELECT
         id,
         name,
         cell_name,
-        "rank",
+        `rank`,
         final
-    FROM wca.round_types
-"""
-
+    FROM round_types
+')"""
 
 _GET_WCA_SINGLE_RANKS_QUERY = """
+FROM mysql_query('wca', '
     SELECT
         person_id,
-        ranks_single.world_rank as wca_world_rank,
-        ranks_single.continent_rank as wca_continent_rank,
-        ranks_single.country_rank as wca_country_rank
-    FROM wca.ranks_single
-    WHERE event_id = '333mbf'
-"""
+        world_rank as wca_world_rank,
+        continent_rank as wca_continent_rank,
+        country_rank as wca_country_rank
+    FROM ranks_single
+    WHERE event_id = ''333mbf''
+')"""
 
 _JOIN_WCA_RANKS_QUERY = """
     SELECT
@@ -103,7 +110,6 @@ _JOIN_WCA_RANKS_QUERY = """
     FROM rankings
     LEFT JOIN wca_ranks ON rankings.person_id = wca_ranks.person_id
 """
-
 
 _GET_BEST_RESULT_QUERY = """
     SELECT
