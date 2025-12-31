@@ -10,7 +10,10 @@ services:
       - wca-open-db-network
 
   mbld-ranks-api:
-    build: ./api
+    build:
+      context: ./api
+      args:
+        API_VERSION: ${API_VERSION:-0.0.0}
     restart: always
     env_file: ./api/.env
     ports:

@@ -1,3 +1,4 @@
+import os
 from typing import Any
 
 from importlib.metadata import PackageNotFoundError, version
@@ -44,11 +45,13 @@ BAD_REQUEST: dict[int | str, dict[str, Any]] = {400: {"model": ErrorMessage}}
 NOT_FOUND: dict[int | str, dict[str, Any]] = {404: {"model": ErrorMessage}}
 
 
-# Resolve package version from installed metadata; fall back to placeholder if unavailable.
-try:
-    api_version = version("api")
-except PackageNotFoundError:
-    api_version = "0.0.0"
+api_version = os.environ.get("API_VERSION")
+if not api_version:
+    try:
+        api_version = version("api")
+    except PackageNotFoundError:
+        api_version = "0.0.0"
+
 
 app = FastAPI(
     title="Multi-Blind Alternative Ranking API",

@@ -1,0 +1,15 @@
+branches:
+  main:
+    regex: ^main$
+    mode: ContinuousDeployment
+    label: ''
+    increment: Patch
+    is-main-branch: true
+  feature:
+    mode: ManualDeployment
+    label: '{BranchName}'
+    increment: Inherit
+    is-source-branch-for: []
+    is-main-branch: false
+ignore:
+  sha: []
