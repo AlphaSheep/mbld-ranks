@@ -229,6 +229,7 @@ def _merge_attempts(results: pd.DataFrame, attempts: pd.DataFrame) -> pd.DataFra
         results = results.merge(values, how="left", on="result_id")
         results[col_name] = results[col_name].fillna(0).astype(int)
 
+    results.drop(columns=["result_id"], inplace=True)
     return results
 
 
