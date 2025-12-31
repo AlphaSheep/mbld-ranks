@@ -20,7 +20,7 @@ COPY --from=builder /code/.venv /code/.venv
 
 COPY ./*.py /code/
 
-ENV VIRTUAL_ENV=/app/.venv
-ENV PATH="/app/.venv/bin:$PATH"
+ENV VIRTUAL_ENV=/code/.venv
+ENV PATH="/code/.venv/bin:$PATH"
 
 CMD ["python", "-m", "run"]
