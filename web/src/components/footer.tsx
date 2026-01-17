@@ -15,7 +15,7 @@ export default function Footer () {
     });
   }, []);
 
-  const apiDocsUrl = `${process.env.API_URL || "api/v0"}/docs`;
+  const apiDocsUrl = `${process.env.API_URL || "api/v2"}/docs`;
 
   return <>
     <footer>
