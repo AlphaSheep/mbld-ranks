@@ -6,6 +6,7 @@ services:
     env_file: ./etl/.env
     volumes:
       - ./data:/data
+      - ./wca-metadata:/wca-metadata
     networks:
       - wca-open-db-network
 
@@ -46,6 +47,7 @@ services:
       - "127.0.0.1:3306:3306"
     volumes:
       - wca-open-db-data:/var/lib/mysql
+      - ./wca-metadata:/wca-metadata  # Optional: mount folder to access metadata.json if using the public export
     networks:
       - wca-open-db-network
 
